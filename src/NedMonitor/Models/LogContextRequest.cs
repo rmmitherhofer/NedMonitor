@@ -24,14 +24,8 @@ public class LogContextRequest
     /// <summary>
     /// The HTTP endpoint path requested.
     /// </summary>
-    [JsonPropertyName("Path")]
+    [JsonPropertyName("path")]
     public string Path { get; set; }
-
-    /// <summary>
-    /// Formatted duration of the request.
-    /// </summary>
-    [JsonPropertyName("requestDuration")]
-    public string RequestDuration { get; set; }
 
     /// <summary>
     /// Elapsed time of the request in milliseconds.

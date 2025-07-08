@@ -46,7 +46,6 @@ public class NedMonitorMiddleware
 
         _diagnostic.Stop();
 
-        if (!context.Request.Path.Value.Contains("swagger"))
-            _queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.ElapsedMilliseconds));
+        _queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.ElapsedMilliseconds));
     }
 }

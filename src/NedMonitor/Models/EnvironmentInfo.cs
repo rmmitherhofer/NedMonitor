@@ -17,7 +17,7 @@ public class EnvironmentInfo
     /// <summary>
     /// The environment name (e.g., Development, Staging, Production).
     /// </summary>
-    [JsonPropertyName("nameX")]
+    [JsonPropertyName("name")]
     public string Name { get; set; }
 
     /// <summary>

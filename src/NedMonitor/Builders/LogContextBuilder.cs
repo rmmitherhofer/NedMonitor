@@ -88,7 +88,6 @@ public class LogContextBuilder : ILogContextBuilder
         {
             CorrelationId = _snapshot.CorrelationId,
             Path = _snapshot.Path,
-            RequestDuration = _snapshot.ElapsedMilliseconds.GetTime(),
             ElapsedMilliseconds = _snapshot.ElapsedMilliseconds,
             TraceIdentifier = _snapshot.TraceId,
             Project = AddProject(),
