@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageId>NedMonitor</PackageId>
-		<Version>9.0.2</Version>
+		<Version>9.0.3</Version>
 		<Authors>Renato Mitherhofer</Authors>
 	</PropertyGroup>
 
@@ -16,6 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="MitherPack.Common.Http" Version="9.0.6" />
-	</ItemGroup>	
+		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net9.0" />
+		<PackageReference Include="MitherPack.Common.Http" Version="9.0.7" />
+	</ItemGroup>
 </Project>
