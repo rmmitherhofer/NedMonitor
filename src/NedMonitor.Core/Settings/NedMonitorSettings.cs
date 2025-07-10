@@ -50,9 +50,15 @@ public class NedMonitorSettings
     /// Configuration options for masking sensitive data in logs, such as passwords or tokens.
     /// </summary>
     public SensitiveDataMaskerOptions? SensitiveDataMasker { get; set; }
-
+    /// <summary>
+    /// Defines the execution mode settings that control how NedMonitor behaves during runtime,
+    /// such as which features to enable (e.g., logging, notifications, exceptions).
+    /// </summary>
     public ExecutionModeSettings ExecutionMode { get; set; } = new();
-
+    /// <summary>
+    /// A list of fully qualified exception type names that should be treated as expected exceptions
+    /// (i.e., not considered errors and may not trigger error logging).
+    /// </summary>
     public List<string> ExpectedExceptions { get; set; } = new();
 }
 

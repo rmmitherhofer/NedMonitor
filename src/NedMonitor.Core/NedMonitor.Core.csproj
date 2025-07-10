@@ -7,7 +7,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 		<PackageId>NedMonitor.Core</PackageId>
-		<Version>9.0.6</Version>
+		<Version>9.0.9</Version>
 		<Authors>Renato Mitherhofer</Authors>
 	</PropertyGroup>
 

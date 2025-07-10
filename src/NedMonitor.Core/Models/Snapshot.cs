@@ -222,7 +222,7 @@ public class Snapshot
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_EXCEPTION_KEY, out var exceptionObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_NOTIFICATIONS_KEY, out var notificationsObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY, out var responseBodySizeObj);
-        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS, out var httpLogsObj);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY, out var httpLogsObj);
 
         return new Snapshot
         {

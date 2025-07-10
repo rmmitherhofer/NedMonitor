@@ -6,7 +6,8 @@ public static class NedMonitorConstants
     public const string CONTEXT_REPONSE_BODY_KEY = "NedMonitor_ResponseBody";
     public const string CONTEXT_REPONSE_BODY_SIZE_KEY = "NedMonitor_ResponseBodySize";
     public const string CONTEXT_NOTIFICATIONS_KEY = "__Notifications__";
-    public const string CONTEXT_HTTP_CLIENT_LOGS = "__HttpClientLogs__";
+    public const string CONTEXT_HTTP_CLIENT_LOGS_KEY = "__HttpClientLogs__";
+    public const string CONTEXT_LOGS_KEY = "__NedMonitor_Logger_Adapter_";
 
     public static readonly List<string> DEFAULT_KEYS =
     [

@@ -96,10 +96,10 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
 
             if (httpContext != null)
             {
-                if (!httpContext.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS, out var listObj) || listObj is not List<HttpRequestLogContext> list)
+                if (!httpContext.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY, out var listObj) || listObj is not List<HttpRequestLogContext> list)
                 {
                     list = [];
-                    httpContext.Items[NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS] = list;
+                    httpContext.Items[NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY] = list;
                 }
 
                 list.Add(context);

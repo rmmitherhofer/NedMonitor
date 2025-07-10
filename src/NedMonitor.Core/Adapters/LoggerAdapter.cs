@@ -16,8 +16,6 @@ public class LoggerAdapter : ILogger
     private readonly FormatterOptions _options;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    private const string LOGS_KEY = "__NedMonitor_Logger_Adapter_";
-
     /// <summary>
     /// Initializes a new instance of the <see cref="LoggerAdapter"/> class.
     /// </summary>
@@ -78,10 +76,10 @@ public class LoggerAdapter : ILogger
 
         if (context == null) return;
 
-        if (!context.Items.TryGetValue(LOGS_KEY, out var obj) || obj is not List<LogEntry> logs)
+        if (!context.Items.TryGetValue(NedMonitorConstants.CONTEXT_LOGS_KEY, out var obj) || obj is not List<LogEntry> logs)
         {
             logs = [];
-            context.Items[LOGS_KEY] = logs;
+            context.Items[NedMonitorConstants.CONTEXT_LOGS_KEY] = logs;
         }
         logs.Add(logEntry);
     }
@@ -93,7 +91,7 @@ public class LoggerAdapter : ILogger
     /// <returns>The list of log entries.</returns>
     public static IEnumerable<LogEntry> GetLogsForCurrentRequest(HttpContext context)
     {
-        if (context.Items.TryGetValue(LOGS_KEY, out var obj) && obj is IEnumerable<LogEntry> logs)
+        if (context.Items.TryGetValue(NedMonitorConstants.CONTEXT_LOGS_KEY, out var obj) && obj is IEnumerable<LogEntry> logs)
             return logs;
 
         return [];

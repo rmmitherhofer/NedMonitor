@@ -134,7 +134,8 @@ public class LogContextBuilder : ILogContextBuilder
         MaxResponseBodySizeInMb = _settings.MaxResponseBodySizeInMb,
         CaptureResponseBody = _settings.CaptureResponseBody,
         WritePayloadToConsole = _settings.WritePayloadToConsole,
-        SensitiveKeys = _settings.SensitiveDataMasker?.SensitiveKeys ?? []
+        SensitiveKeys = _settings.SensitiveDataMasker?.SensitiveKeys ?? [],
+        ExpectedExceptions = _settings.ExpectedExceptions ?? [],
     };
 
     /// <summary>

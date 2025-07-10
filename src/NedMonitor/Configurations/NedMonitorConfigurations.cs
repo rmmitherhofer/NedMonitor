@@ -147,6 +147,8 @@ public static class NedMonitorConfigurations
 
         app.TryUseMiddleware<CaptureResponseBodyMiddleware>();
 
+        app.TryUseMiddleware<NedMonitorExceptionCaptureMiddleware>();
+
         return app;
     }
 
