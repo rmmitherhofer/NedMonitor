@@ -5,8 +5,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 		<PackageId>NedMonitor</PackageId>
-		<Version>9.0.4</Version>
+		<Version>9.0.6</Version>
 		<Authors>Renato Mitherhofer</Authors>
 	</PropertyGroup>
 
@@ -20,6 +21,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\NedMonitor.Http\NedMonitor.Http.csproj" />
+	  <PackageReference Include="NedMonitor.Http" Version="9.0.6" />
 	</ItemGroup>
 </Project>

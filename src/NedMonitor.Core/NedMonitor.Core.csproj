@@ -4,12 +4,21 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeReferencedProjects>true</IncludeReferencedProjects>
+		<PackageId>NedMonitor.Core</PackageId>
+		<Version>9.0.6</Version>
+		<Authors>Renato Mitherhofer</Authors>
 	</PropertyGroup>
-	
+
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net9.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="MitherPack.Common.Http" Version="9.0.8" />
