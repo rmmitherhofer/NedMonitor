@@ -11,12 +11,13 @@ using Microsoft.Extensions.Options;
 using NedMonitor.Applications;
 using NedMonitor.BackgroundServices;
 using NedMonitor.Builders;
-using NedMonitor.Configurations.Settings;
-using NedMonitor.Enums;
+using NedMonitor.Core;
+using NedMonitor.Core.Settings;
+using NedMonitor.Extensions;
+using NedMonitor.Http.Handlers;
 using NedMonitor.Middleware;
 using NedMonitor.Providers;
 using NedMonitor.Queues;
-using NedMonitor.Extensions;
 
 namespace NedMonitor.Configurations;
 
@@ -65,14 +66,7 @@ public static class NedMonitorConfigurations
         {
             var options = sp.GetRequiredService<IOptions<NedMonitorSettings>>().Value.SensitiveDataMasker;
 
-            List<string> defaultKeys = ["password",    "senha",    "token",    "access_token",    "refresh_token",
-                "jwt",    "jwe",    "jws",    "jwk",    "jwa",    "jwm",
-                "auth",    "authentication",    "authorization",    "autenticacao",    "autorizacao",
-                "secret",    "client_secret",    "api_key",    "secret_key",    "private_key",
-                "assinatura",    "signature",    "segredo",    "pin",    "otp",    "mfa_code",    "codigo_mfa"
-                ];
-
-            var mergedKeys = defaultKeys
+            var mergedKeys = NedMonitorConstants.DEFAULT_KEYS
                 .Concat(options.SensitiveKeys ?? Enumerable.Empty<string>())
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
@@ -107,9 +101,12 @@ public static class NedMonitorConfigurations
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
-        if (settings.ExecutionMode == ExecutionMode.Disabled) return services;
+        if (!settings.ExecutionMode.EnableNedMonitor) return services;
 
-        if (settings.ExecutionMode == ExecutionMode.Full)
+        if(settings.ExecutionMode.EnableMonitorHttpRequests)        
+            services.TryAddTransient<NedMonitorHttpLoggingHandler>();        
+
+        if (settings.ExecutionMode.EnableMonitorLogs)
         {
             services.AddSingleton<ILoggerProvider, LoggerProvider>(sp =>
             {
@@ -121,7 +118,7 @@ public static class NedMonitorConfigurations
         services.TryAddScoped<INedMonitorApplication, NedMonitorApplication>();
         services.TryAddScoped<ILogContextBuilder, LogContextBuilder>();
 
-        services.AddSingleton<INedMonitorQueue, NedMonitorQueue>();
+        services.TryAddScoped<INedMonitorQueue, NedMonitorQueue>();
         services.AddHostedService<NedMonitorBackgroundService>();
 
         services.AddHttpService(configuration);
@@ -142,7 +139,7 @@ public static class NedMonitorConfigurations
 
         var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
-        if (settings.ExecutionMode == ExecutionMode.Disabled) return app;
+        if (!settings.ExecutionMode.EnableNedMonitor) return app;
 
         app.TryUseMiddleware<NedMonitorMiddleware>();
 

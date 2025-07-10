@@ -1,4 +1,4 @@
-﻿using NedMonitor.Models;
+﻿using NedMonitor.Core.Models;
 using System.Threading.Channels;
 
 namespace NedMonitor.Queues;

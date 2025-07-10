@@ -1,10 +1,11 @@
-﻿using Common.Extensions;
-using Common.Json;
+﻿using Common.Json;
 using Common.Notifications.Messages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NedMonitor.Configurations.Settings;
+using NedMonitor.Core.Extensions;
+using NedMonitor.Core.Models;
+using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
 using NedMonitor.Models;
 using System.Net;
@@ -13,7 +14,7 @@ using System.Reflection;
 namespace NedMonitor.Builders;
 
 /// <summary>
-/// Builder responsible for constructing a <see cref="LogContextRequest"/> by aggregating contextual
+/// Builder responsible for constructing a <see cref="LogContextHttpRequest"/> by aggregating contextual
 /// information such as HTTP request and response details, environment data, user identity, notifications,
 /// log entries, exceptions, and diagnostics to be sent to NedMonitor.
 /// </summary>
@@ -25,8 +26,9 @@ public class LogContextBuilder : ILogContextBuilder
     private Snapshot _snapshot;
     private LogLevel _logLevel;
     private string? _errorCategory;
-    private IEnumerable<Notification> _notifications;
-    private IEnumerable<LogEntry> _logEntries;
+    private IEnumerable<Notification>? _notifications;
+    private IEnumerable<LogEntry>? _logEntries;
+    private IEnumerable<HttpRequestLogContext>? _httpClientLogs;
     private Exception? _exception;
 
     /// <summary>
@@ -77,14 +79,24 @@ public class LogContextBuilder : ILogContextBuilder
         _exception = _snapshot.Exception;
         return this;
     }
+    /// <summary>
+    /// Includes any collected HTTP client logs from the snapshot into the log context.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ILogContextBuilder WithHttpClientLogs()
+    {
+        _httpClientLogs = _snapshot.HttpClientLogs;
+        return this;
+    }
 
     /// <summary>
-    /// Builds and returns a fully constructed <see cref="LogContextRequest"/> object with all aggregated data.
+    /// Finalizes the builder configuration and returns a fully populated <see cref="LogContextHttpRequest"/> object.
+    /// This method should be called after all <c>WithX</c> methods to include desired context.
     /// </summary>
-    /// <returns>A populated instance of <see cref="LogContextRequest"/>.</returns>
-    public LogContextRequest Build()
+    /// <returns>A constructed <see cref="LogContextHttpRequest"/> with aggregated data.</returns>
+    public LogContextHttpRequest Build()
     {
-        return new LogContextRequest
+        return new LogContextHttpRequest
         {
             CorrelationId = _snapshot.CorrelationId,
             Path = _snapshot.Path,
@@ -96,9 +108,10 @@ public class LogContextBuilder : ILogContextBuilder
             Request = AddRequestInfo(),
             Response = AddResponseInfo(),
             Diagnostic = AddDiagnostics(),
-            LogEntries = AddLogEntries(),            
+            LogEntries = AddLogEntries(),
             Notifications = AddNotifications(),
             Exceptions = AddExceptions(),
+            HttpClientLogs = AddHttpClientLogs(),
             LogAttentionLevel = _logLevel.Map(),
             ErrorCategory = _errorCategory
         };
@@ -107,24 +120,29 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Gathers metadata about the current NedMonitor project such as ID, name, and type.
     /// </summary>
-    /// <returns>A <see cref="ProjectInfo"/> object containing project details.</returns>
-    private ProjectInfo AddProject() => new()
+    /// <returns>A <see cref="ProjectInfoHttp"/> object containing project details.</returns>
+    private ProjectInfoHttp AddProject() => new()
     {
         Id = _settings.ProjectId,
         Name = _settings.Name,
         Type = _settings.ProjectType,
-        ExecutionMode = _settings.ExecutionMode,
+        EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
+        EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,
+        EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
+        EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
+        EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
         MaxResponseBodySizeInMb = _settings.MaxResponseBodySizeInMb,
         CaptureResponseBody = _settings.CaptureResponseBody,
-        WritePayloadToConsole = _settings.WritePayloadToConsole
+        WritePayloadToConsole = _settings.WritePayloadToConsole,
+        SensitiveKeys = _settings.SensitiveDataMasker?.SensitiveKeys ?? []
     };
 
     /// <summary>
     /// Collects environment-related details like machine name, environment name, thread ID, and application version.
     /// </summary>
-    /// <returns>A <see cref="EnvironmentInfo"/> object describing the runtime environment.</returns>
+    /// <returns>A <see cref="EnvironmentInfoHttpRequest"/> object describing the runtime environment.</returns>
 
-    private EnvironmentInfo AddEnvironment() => new()
+    private EnvironmentInfoHttpRequest AddEnvironment() => new()
     {
         MachineName = Environment.MachineName,
         Name = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",
@@ -135,11 +153,11 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Extracts user identity and authentication-related data from the snapshot.
     /// </summary>
-    /// <returns>A <see cref="UserContextRequest"/> object describing the current user context.</returns>
+    /// <returns>A <see cref="UserInfoHttpRequest"/> object describing the current user context.</returns>
 
-    private UserContextRequest AddUserContext()
+    private UserInfoHttpRequest AddUserContext()
     {
-        return new UserContextRequest
+        return new UserInfoHttpRequest
         {
             Id = _snapshot.UserId,
             Name = _snapshot.UserName,
@@ -157,13 +175,13 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Builds detailed HTTP request information including headers, metadata, and masked body content.
     /// </summary>
-    /// <returns>A <see cref="RequestInfoRequest"/> containing request information.</returns>
+    /// <returns>A <see cref="RequestInfoHttpRequest"/> containing request information.</returns>
 
-    private RequestInfoRequest AddRequestInfo()
+    private RequestInfoHttpRequest AddRequestInfo()
     {
         var requestBodyObj = GetRequestBody(_snapshot.RequestBody);
 
-        return new RequestInfoRequest
+        return new RequestInfoHttpRequest
         {
             Id = _snapshot.RequestId,
             HttpMethod = _snapshot.Method,
@@ -188,13 +206,13 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Builds detailed HTTP response information including status, headers, and masked body content.
     /// </summary>
-    /// <returns>A <see cref="ResponseInfoRequest"/> containing response information.</returns>
+    /// <returns>A <see cref="ResponseInfoHttpRequest"/> containing response information.</returns>
 
-    private ResponseInfoRequest AddResponseInfo()
+    private ResponseInfoHttpRequest AddResponseInfo()
     {
         var responseBodyObj = GetResponseBody(_snapshot.ResponseBody);
 
-        return new ResponseInfoRequest
+        return new ResponseInfoHttpRequest
         {
             StatusCode = (HttpStatusCode)_snapshot.StatusCode,
             ReasonPhrase = ReasonPhrases.GetReasonPhrase(_snapshot.StatusCode),
@@ -207,9 +225,9 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Gathers diagnostic information such as memory usage and placeholder data for DB/cache dependencies.
     /// </summary>
-    /// <returns>A <see cref="DiagnosticRequest"/> object with diagnostic information.</returns>
+    /// <returns>A <see cref="DiagnosticHttpRequest"/> object with diagnostic information.</returns>
 
-    private DiagnosticRequest AddDiagnostics() => new()
+    private DiagnosticHttpRequest AddDiagnostics() => new()
     {
         MemoryUsageMb = _snapshot.MemoryUsageMb,
         DbQueryCount = 0,
@@ -220,13 +238,13 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Maps captured log entries to their serializable format, if any exist.
     /// </summary>
-    /// <returns>An enumerable of <see cref="LogEntryRequest"/>.</returns>
+    /// <returns>An enumerable of <see cref="LogEntryHttpRequest"/>.</returns>
 
-    private IEnumerable<LogEntryRequest> AddLogEntries()
+    private IEnumerable<LogEntryHttpRequest> AddLogEntries()
     {
-        if(_logEntries?.Any() != true) return [];
+        if (_logEntries?.Any() != true) return [];
 
-        return _logEntries.Select(e => new LogEntryRequest
+        return _logEntries.Select(e => new LogEntryHttpRequest
         {
             LogCategory = e.Category,
             LogSeverity = e.LogLevel,
@@ -241,9 +259,9 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Maps domain notifications to their serializable format and updates the log severity and error category accordingly.
     /// </summary>
-    /// <returns>An enumerable of <see cref="NotificationInfoRequest"/>.</returns>
+    /// <returns>An enumerable of <see cref="NotificationInfoHttpRequest"/>.</returns>
 
-    private IEnumerable<NotificationInfoRequest> AddNotifications()
+    private IEnumerable<NotificationInfoHttpRequest> AddNotifications()
     {
         if (_notifications?.Any() != true) return [];
 
@@ -254,7 +272,7 @@ public class LogContextBuilder : ILogContextBuilder
         if (_logLevel > LogLevel.Information)
             _errorCategory = "Notification";
 
-        return _notifications.Select(n => new NotificationInfoRequest
+        return _notifications.Select(n => new NotificationInfoHttpRequest
         {
             Id = n.Id,
             Key = n.Key,
@@ -267,9 +285,9 @@ public class LogContextBuilder : ILogContextBuilder
     /// <summary>
     /// Maps captured exception into a serializable format and sets log level to critical.
     /// </summary>
-    /// <returns>An enumerable with a single <see cref="ExceptionInfoRequest"/>, or empty if no exception exists.</returns>
+    /// <returns>An enumerable with a single <see cref="ExceptionInfoHttpRequest"/>, or empty if no exception exists.</returns>
 
-    private IEnumerable<ExceptionInfoRequest> AddExceptions()
+    private IEnumerable<ExceptionInfoHttpRequest> AddExceptions()
     {
         if (_exception == null) return [];
 
@@ -278,7 +296,7 @@ public class LogContextBuilder : ILogContextBuilder
 
         return
         [
-            new ExceptionInfoRequest
+            new ExceptionInfoHttpRequest
             {
                 Type = _exception.GetType().FullName,
                 Message = _exception.Message,
@@ -287,6 +305,53 @@ public class LogContextBuilder : ILogContextBuilder
             }
         ];
     }
+    /// <summary>
+    /// Maps HTTP client log entries from the snapshot to a serializable format.
+    /// </summary>
+    /// <returns>An enumerable of <see cref="HttpClientLogInfoHttpRequest"/>.</returns>
+    private IEnumerable<HttpClientLogInfoHttpRequest> AddHttpClientLogs()
+    {
+        if (_httpClientLogs?.Any() != true) return [];
+
+        return _httpClientLogs.Select(n => new HttpClientLogInfoHttpRequest
+        {
+            StartTime = n.StartTime,
+            EndTime = n.EndTime,
+            Method = n.Method,
+            Url = n.FullUrl,
+            TemplateUrl = n.UrlTemplate,
+            StatusCode = (HttpStatusCode)n.StatusCode,
+            RequestBody = GetObjectBody(n.RequestBody),
+            ResponseBody = GetObjectBody(n.ResponseBody),
+            RequestHeaders = n.RequestHeaders,
+            ResponseHeaders = n.ResponseHeaders,
+            ExceptionType = n.ExceptionType,
+            ExceptionMessage = n.ExceptionMessage,
+            StackTrace = n.StackTrace
+
+        });
+    }
+    /// <summary>
+    /// Attempts to deserialize and mask sensitive data from a JSON string.
+    /// </summary>
+    /// <param name="body">The raw JSON body string.</param>
+    /// <returns>A masked object if successful; otherwise, null.</returns>
+    private object? GetObjectBody(string body)
+    {
+        if (string.IsNullOrEmpty(body)) return null;
+
+        try
+        {
+            var formattedJson = JsonExtensions.TryFormatJson(body);
+            var obj = JsonExtensions.Deserialize<object>(formattedJson);
+            return _sensitiveDataMasker.Mask(obj);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Attempts to deserialize and mask sensitive information from the response body.
     /// </summary>

@@ -11,5 +11,5 @@ public interface INedMonitorHttpService
     /// Sends a complete log context to the NedMonitor API.
     /// </summary>
     /// <param name="log">The structured log context containing request, response, and diagnostics data.</param>
-    Task Flush(LogContextRequest log);
+    Task Flush(LogContextHttpRequest log);
 }

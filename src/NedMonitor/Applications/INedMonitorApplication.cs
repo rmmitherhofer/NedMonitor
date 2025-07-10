@@ -1,4 +1,4 @@
-﻿using NedMonitor.Models;
+﻿using NedMonitor.Core.Models;
 
 namespace NedMonitor.Applications;
 

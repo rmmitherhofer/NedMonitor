@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using NedMonitor.Configurations.Settings;
+using NedMonitor.Core;
+using NedMonitor.Core.Settings;
 
 namespace NedMonitor.Middleware;
 
@@ -19,7 +20,7 @@ public class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMon
     private readonly RequestDelegate _next = next;
 
     /// <summary>
-    /// Captures the response body and stores it in <c>HttpContext.Items["CapturedResponseBody"]</c>
+    /// Captures the response body and stores it in <c>HttpContext.Items["NedMonitor_ResponseBody"]</c>
     /// if the content length is within the allowed size.
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
@@ -47,9 +48,9 @@ public class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMon
             {
                 capturedBody = $"[Body not captured. Size exceeds limit of {_settings.MaxResponseBodySizeInMb}MB]";
             }
-            context.Items["CapturedResponseBody"] = capturedBody;
+            context.Items[NedMonitorConstants.CONTEXT_REPONSE_BODY_KEY] = capturedBody;
         }
-        context.Items["CapturedResponseBodySize"] = memoryStream.Length;
+        context.Items[NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY] = memoryStream.Length;
 
         memoryStream.Seek(0, SeekOrigin.Begin);
         await memoryStream.CopyToAsync(originalBody);

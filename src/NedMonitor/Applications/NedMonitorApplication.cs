@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using NedMonitor.Builders;
-using NedMonitor.Configurations.Settings;
-using NedMonitor.Enums;
+using NedMonitor.Core.Models;
+using NedMonitor.Core.Settings;
 using NedMonitor.HttpServices;
 using NedMonitor.Models;
 
@@ -42,33 +42,25 @@ public class NedMonitorApplication : INedMonitorApplication
 
     public async Task Notify(Snapshot snapshot)
     {
-        if (_settings.ExecutionMode == ExecutionMode.Disabled) return;
+        if (!_settings.ExecutionMode.EnableNedMonitor) return;
 
-        LogContextRequest log = null;
+        ILogContextBuilder builder = _builder.WithSnapshot(snapshot);
 
-        switch (_settings.ExecutionMode)
-        {
-            case ExecutionMode.ExceptionsOnly:
-                log = _builder.WithSnapshot(snapshot)
-                    .WithException()
-                    .Build();
-                break;
+        var strategies = new List<Action<ILogContextBuilder>>();
 
-            case ExecutionMode.NotificationsAndExceptions:
-                log = _builder.WithSnapshot(snapshot)
-                    .WithNotifications()
-                    .WithException()
-                    .Build();
-                break;
+        if (_settings.ExecutionMode.EnableMonitorExceptions) strategies.Add(b => b.WithException());
 
-            case ExecutionMode.Full:
-                log = _builder.WithSnapshot(snapshot)
-                    .WithLogEntries()
-                    .WithNotifications()
-                    .WithException()
-                    .Build();
-                break;
-        }
+        if (_settings.ExecutionMode.EnableMonitorHttpRequests) strategies.Add(b => b.WithHttpClientLogs());
+
+        if (_settings.ExecutionMode.EnableMonitorNotifications) strategies.Add(b => b.WithNotifications());
+
+        if (_settings.ExecutionMode.EnableMonitorLogs) strategies.Add(b => b.WithLogEntries());
+
+        foreach (var strategy in strategies)
+            strategy(builder);
+
+        LogContextHttpRequest log = builder.Build();
+
         await _httpService.Flush(log);
     }
 }

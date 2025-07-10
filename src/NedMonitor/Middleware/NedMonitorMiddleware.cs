@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using NedMonitor.Queues;
-using System.Diagnostics;
+using NedMonitor.Core.Models;
 using NedMonitor.Models;
+using NedMonitor.Queues;
+using System;
+using System.Diagnostics;
 
 namespace NedMonitor.Middleware;
 

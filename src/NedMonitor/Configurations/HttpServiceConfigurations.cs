@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NedMonitor.Configurations.Settings;
+using NedMonitor.Core.Settings;
 using NedMonitor.HttpServices;
 
 namespace NedMonitor.Configurations;

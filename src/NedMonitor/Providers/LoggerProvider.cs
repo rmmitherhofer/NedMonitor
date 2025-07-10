@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using NedMonitor.Configurations.Settings;
-using NedMonitor.Adapters;
+using NedMonitor.Core.Adapters;
+using NedMonitor.Core.Settings;
 
 namespace NedMonitor.Providers;
 
