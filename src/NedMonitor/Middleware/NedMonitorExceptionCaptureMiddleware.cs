@@ -35,7 +35,7 @@ public class NedMonitorExceptionCaptureMiddleware
         catch (Exception ex)
         {
             bool isExpected = _settings.ExpectedExceptions?.Any(expected =>
-                ex.GetType().FullName?.Equals(expected, StringComparison.OrdinalIgnoreCase) == true) ?? false;
+                ex.GetType().Name?.Equals(expected, StringComparison.OrdinalIgnoreCase) == true) ?? false;
 
             if (!isExpected)
                 context.Items[NedMonitorConstants.CONTEXT_EXCEPTION_KEY] = ex;

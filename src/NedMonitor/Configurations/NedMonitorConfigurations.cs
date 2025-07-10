@@ -147,6 +147,25 @@ public static class NedMonitorConfigurations
 
         app.TryUseMiddleware<CaptureResponseBodyMiddleware>();
 
+        return app;
+    }
+
+    /// <summary>
+    /// Adds the NedMonitor exception capture middleware to the application's request pipeline,
+    /// if the execution mode is configured to monitor exceptions.
+    /// </summary>
+    /// <param name="app">The application builder.</param>
+    /// <returns>The updated application builder.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the application builder is null.</exception>
+
+    public static IApplicationBuilder UseNedMonitorMiddleware(this IApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app, nameof(IApplicationBuilder));
+
+        var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
+
+        if (!settings.ExecutionMode.EnableMonitorExceptions) return app;
+
         app.TryUseMiddleware<NedMonitorExceptionCaptureMiddleware>();
 
         return app;
