@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedMonitor.Http", "src\NedM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedMonitor.Core", "src\NedMonitor.Core\NedMonitor.Core.csproj", "{6CDBA98A-D09E-4CE5-B147-F1E6C89FEFFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedMonitor.DataInterceptors", "src\NedMonitor.DataInterceptors\NedMonitor.DataInterceptors.csproj", "{A2905529-95BA-4EF0-8683-FF2D059C2FDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{6CDBA98A-D09E-4CE5-B147-F1E6C89FEFFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CDBA98A-D09E-4CE5-B147-F1E6C89FEFFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CDBA98A-D09E-4CE5-B147-F1E6C89FEFFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2905529-95BA-4EF0-8683-FF2D059C2FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2905529-95BA-4EF0-8683-FF2D059C2FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2905529-95BA-4EF0-8683-FF2D059C2FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2905529-95BA-4EF0-8683-FF2D059C2FDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 		{24E2677B-E9B5-8920-F4D0-A3D46E901175} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A2353CC7-3190-4640-AA51-A1DFF1596381} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{6CDBA98A-D09E-4CE5-B147-F1E6C89FEFFA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A2905529-95BA-4EF0-8683-FF2D059C2FDD} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40C2B9AC-7AA8-441E-85FE-0E5C3A527025}
