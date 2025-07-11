@@ -1,7 +1,7 @@
 ﻿using Api.Responses;
-using Common.Exceptions;
 using Common.Extensions;
 using Common.Http;
+using Common.Http.Exceptions;
 using Common.Http.Extensions;
 using Common.Json;
 using Common.Logs.Extensions;

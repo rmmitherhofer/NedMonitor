@@ -33,7 +33,7 @@ public static class NedMonitorConfigurations
     /// <param name="configuration">Application configuration to bind NedMonitor settings.</param>
     /// <param name="configure">Action to configure <see cref="FormatterOptions"/>.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddNedMonitor(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions> configure)
+    public static IServiceCollection AddNedMonitor(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions>? configure =null)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
@@ -89,7 +89,7 @@ public static class NedMonitorConfigurations
     /// <param name="configuration">The application configuration instance.</param>
     /// <param name="configure">Action to configure <see cref="FormatterOptions"/>.</param>
     /// <returns>The updated service collection.</returns>
-    private static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions> configure)
+    private static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
