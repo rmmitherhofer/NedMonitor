@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NedMonitor.Core.Formatters;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
@@ -14,6 +15,7 @@ public class LoggerAdapter : ILogger
 {
     private readonly string _category;
     private readonly FormatterOptions _options;
+    private readonly NedMonitorSettings _settings;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -22,12 +24,13 @@ public class LoggerAdapter : ILogger
     /// <param name="options">The logger options.</param>
     /// <param name="category">The logger category.</param>
     /// <param name="httpContextAccessor">HTTP context accessor.</param>
-    public LoggerAdapter(FormatterOptions options, string category, IHttpContextAccessor httpContextAccessor)
+    public LoggerAdapter(FormatterOptions options, string category, IHttpContextAccessor httpContextAccessor, IOptions<NedMonitorSettings> settings)
     {
         ArgumentNullException.ThrowIfNull(options, nameof(FormatterOptions));
 
         _options = options;
         _category = category;
+        _settings = settings.Value;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -39,7 +42,7 @@ public class LoggerAdapter : ILogger
     /// <summary>
     /// Determines whether the given log level is enabled. Always returns true.
     /// </summary>
-    public bool IsEnabled(LogLevel logLevel) => true;
+    public bool IsEnabled(LogLevel logLevel) => logLevel >= _settings.MinimumLogLevel;
 
     /// <summary>
     /// Logs a message to the current HTTP context.
@@ -52,7 +55,7 @@ public class LoggerAdapter : ILogger
     /// <param name="formatter">The message formatter.</param>
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
     {
-        if (formatter == null) return;
+        if (!IsEnabled(logLevel) || formatter == null) return;
 
         var message = formatter(state, exception);
 

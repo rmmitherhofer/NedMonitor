@@ -33,6 +33,8 @@ public static class NedMonitorConstants
     /// </summary>
     public const string CONTEXT_LOGS_KEY = "__NedMonitor_Logger_Adapter_";
 
+    public const string CONTEXT_CACHEHIT_KEY = "NedMonitor_CacheHit";
+
     /// <summary>
     /// Default sensitive keys to be masked or excluded from logs and monitoring payloads.
     /// Includes both English and Portuguese terms commonly used for credentials, tokens, secrets, and authentication.

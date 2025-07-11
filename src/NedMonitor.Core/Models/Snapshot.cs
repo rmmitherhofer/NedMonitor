@@ -4,6 +4,7 @@ using Common.Notifications.Messages;
 using Common.User.Extensions;
 using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Adapters;
+using System.Diagnostics;
 
 namespace NedMonitor.Core.Models;
 
@@ -165,6 +166,21 @@ public class Snapshot
     /// Total memory usage (in MB) at the time of snapshot.
     /// </summary>
     public double MemoryUsageMb { get; set; }
+
+    /// <summary>
+    /// The number of database queries executed.
+    /// </summary>
+    public int DbQueryCount { get; set; }
+
+    /// <summary>
+    /// Indicates whether the cache was hit during the operation.
+    /// </summary>
+    public bool CacheHit { get; set; }
+
+    /// <summary>
+    /// List of dependencies involved in the operation.
+    /// </summary>
+    public IEnumerable<DependencyInfo>? Dependencies { get; set; }
     #endregion
 
     /// <summary>
@@ -223,6 +239,7 @@ public class Snapshot
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_NOTIFICATIONS_KEY, out var notificationsObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY, out var responseBodySizeObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY, out var httpLogsObj);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_CACHEHIT_KEY, out var hit);
 
         return new Snapshot
         {
@@ -258,7 +275,18 @@ public class Snapshot
             #endregion
 
             #region Diagnostic
-            MemoryUsageMb = GC.GetTotalMemory(false) / (1024.0 * 1024),
+            MemoryUsageMb = Process.GetCurrentProcess().WorkingSet64 / (1024.0 * 1024.0),
+            DbQueryCount = 0,
+            CacheHit = hit is true,
+            Dependencies = httpLogsObj is List<HttpRequestLogContext> logs
+                    ? logs.Select(log => new DependencyInfo
+                    {
+                        Type = "HTTP",
+                        Target = log.UrlTemplate ?? log.FullUrl,
+                        DurationMs = (int)(log.EndTime - log.StartTime).TotalMilliseconds,
+                        Success = log.StatusCode < 500 && log.ExceptionType == null
+                    }).ToList()
+                    : null,
             #endregion
 
             #region User
@@ -274,6 +302,8 @@ public class Snapshot
             Roles = user.GetRoles(),
             Claims = user.Claims.ToDictionary(c => c.Type, c => c.Value),
             #endregion
+
+            ThreadId = Environment.CurrentManagedThreadId,
 
             LogEntries = LoggerAdapter.GetLogsForCurrentRequest(context),
             Notifications = notificationsObj is IEnumerable<Notification> notifications ? notifications : null,

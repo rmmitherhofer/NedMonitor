@@ -1,4 +1,5 @@
-﻿using NedMonitor.Core.Enums;
+﻿using Microsoft.Extensions.Logging;
+using NedMonitor.Core.Enums;
 using System.Reflection;
 
 namespace NedMonitor.Core.Settings;
@@ -45,6 +46,11 @@ public class NedMonitorSettings
     /// Useful for debugging during development.
     /// </summary>
     public bool WritePayloadToConsole { get; set; } = false;
+    /// <summary>
+    /// Defines the minimum log level to be captured and stored during a request lifecycle.
+    /// Log entries below this level will be ignored.
+    /// </summary>
+    public LogLevel MinimumLogLevel { get; set; } = LogLevel.Information;
 
     /// <summary>
     /// Configuration options for masking sensitive data in logs, such as passwords or tokens.

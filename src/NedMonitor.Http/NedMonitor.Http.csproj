@@ -7,7 +7,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 		<PackageId>NedMonitor.Http</PackageId>
-		<Version>9.1.1</Version>
+		<Version>9.1.3</Version>
 		<Authors>Renato Mitherhofer</Authors>
 	</PropertyGroup>
 
@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NedMonitor.Core" Version="9.1.1" />
+	  <PackageReference Include="NedMonitor.Core" Version="9.1.3" />
 	</ItemGroup>
 
 </Project>
