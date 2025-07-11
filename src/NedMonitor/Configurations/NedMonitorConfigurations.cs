@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 using NedMonitor.Applications;
 using NedMonitor.BackgroundServices;
 using NedMonitor.Builders;
-using NedMonitor.Core;
 using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
 using NedMonitor.Http.Handlers;
@@ -99,19 +98,19 @@ public static class NedMonitorConfigurations
         configure?.Invoke(options);
 
         var provider = services.BuildServiceProvider();
-        var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
+        var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>();
 
-        if (!settings.ExecutionMode.EnableNedMonitor) return services;
+        if (!settings.Value.ExecutionMode.EnableNedMonitor) return services;
 
-        if(settings.ExecutionMode.EnableMonitorHttpRequests)        
+        if(settings.Value.ExecutionMode.EnableMonitorHttpRequests)        
             services.TryAddTransient<NedMonitorHttpLoggingHandler>();        
 
-        if (settings.ExecutionMode.EnableMonitorLogs)
+        if (settings.Value.ExecutionMode.EnableMonitorLogs)
         {
             services.AddSingleton<ILoggerProvider, LoggerProvider>(sp =>
             {
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                return new LoggerProvider(options, httpContextAccessor);
+                return new LoggerProvider(options, httpContextAccessor, settings);
             });
         }
 

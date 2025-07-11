@@ -146,8 +146,8 @@ public class LogContextBuilder : ILogContextBuilder
     private EnvironmentInfoHttpRequest AddEnvironment() => new()
     {
         MachineName = Environment.MachineName,
-        Name = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",
-        ApplicationVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "Unknown",
+        Name = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",
+        ApplicationVersion = Environment.GetEnvironmentVariable("BuildID") ?? Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "Unknown",
         ThreadId = _snapshot.ThreadId,
     };
 
