@@ -11,12 +11,14 @@ using Microsoft.Extensions.Options;
 using NedMonitor.Applications;
 using NedMonitor.BackgroundServices;
 using NedMonitor.Builders;
+using NedMonitor.Core;
 using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
 using NedMonitor.Http.Handlers;
 using NedMonitor.Middleware;
 using NedMonitor.Providers;
 using NedMonitor.Queues;
+using System.IO.Pipes;
 
 namespace NedMonitor.Configurations;
 
@@ -32,7 +34,7 @@ public static class NedMonitorConfigurations
     /// <param name="configuration">Application configuration to bind NedMonitor settings.</param>
     /// <param name="configure">Action to configure <see cref="FormatterOptions"/>.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddNedMonitor(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions>? configure =null)
+    public static IServiceCollection AddNedMonitor(this IServiceCollection services, IConfiguration configuration, Action<FormatterOptions>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
@@ -61,21 +63,33 @@ public static class NedMonitorConfigurations
 
         services.Configure<NedMonitorSettings>(configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE));
 
+        services.PostConfigure<NedMonitorSettings>(settings =>
+        {
+            bool dbQueryEnabled = settings.ExecutionMode.EnableMonitorDbQueries;
+
+            if (settings.DataInterceptors?.EF is not null &&
+                (settings.DataInterceptors.EF.Enabled == default || !dbQueryEnabled))
+            {
+                settings.DataInterceptors.EF.Enabled = dbQueryEnabled;
+            }
+
+            if (settings.DataInterceptors?.Dapper is not null &&
+                (settings.DataInterceptors.Dapper.Enabled == default || !dbQueryEnabled))
+            {
+                settings.DataInterceptors.Dapper.Enabled = dbQueryEnabled;
+            }
+
+            settings.SensitiveDataMasking.SensitiveKeys = NedMonitorConstants.DEFAULT_KEYS
+               .Concat(settings.SensitiveDataMasking?.SensitiveKeys ?? Enumerable.Empty<string>())
+               .Distinct(StringComparer.OrdinalIgnoreCase)
+               .ToList();
+        });
+
         services.AddSingleton(sp =>
         {
-            var options = sp.GetRequiredService<IOptions<NedMonitorSettings>>().Value.SensitiveDataMasker;
+            var options = sp.GetRequiredService<IOptions<NedMonitorSettings>>().Value.SensitiveDataMasking;
 
-            var mergedKeys = NedMonitorConstants.DEFAULT_KEYS
-                .Concat(options.SensitiveKeys ?? Enumerable.Empty<string>())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            var finalOptions = new SensitiveDataMaskerOptions
-            {
-                SensitiveKeys = mergedKeys
-            };
-
-            return new SensitiveDataMasker(finalOptions);
+            return new SensitiveDataMasker(options);
         });
 
         return services;
@@ -100,10 +114,9 @@ public static class NedMonitorConfigurations
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>();
 
-        if (!settings.Value.ExecutionMode.EnableNedMonitor) return services;
+        services.TryAddTransient<NedMonitorHttpLoggingHandler>();
 
-        if(settings.Value.ExecutionMode.EnableMonitorHttpRequests)        
-            services.TryAddTransient<NedMonitorHttpLoggingHandler>();        
+        if (!settings.Value.ExecutionMode.EnableNedMonitor) return services; 
 
         if (settings.Value.ExecutionMode.EnableMonitorLogs)
         {
@@ -163,7 +176,7 @@ public static class NedMonitorConfigurations
 
         var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
-        if (!settings.ExecutionMode.EnableMonitorExceptions) return app;
+        if (!settings.ExecutionMode.EnableNedMonitor || !settings.ExecutionMode.EnableMonitorExceptions) return app;
 
         app.TryUseMiddleware<NedMonitorExceptionCaptureMiddleware>();
 

@@ -1,6 +1,7 @@
 ﻿using Common.Http.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using NedMonitor.Core;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
 
@@ -61,7 +62,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
             .ToDictionary(h => h.Key, h => h.Value.ToList())
         };
 
-        if (request.Content != null)
+        if (request.Content is not null)
             context.RequestBody = await request.Content.ReadAsStringAsync();
 
         try
@@ -75,10 +76,10 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
                 .Concat(response.Content?.Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
                 .ToDictionary(h => h.Key, h => h.Value.ToList());
 
-            if (request.Content != null)
+            if (request.Content is not null)
             {
                 var rawBody = await request.Content.ReadAsStringAsync();
-                long maxSize = _settings.MaxResponseBodySizeInMb * 1024L * 1024L;
+                long maxSize = _settings.HttpLogging.MaxResponseBodySizeInMb * 1024L * 1024L;
 
                 if (rawBody.Length <= maxSize)
                 {
@@ -86,7 +87,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
                 }
                 else
                 {
-                    context.RequestBody = $"[Body not captured. Size exceeds limit of {_settings.MaxResponseBodySizeInMb}MB]";
+                    context.RequestBody = $"[Body not captured. Size exceeds limit of {_settings.HttpLogging.MaxResponseBodySizeInMb}MB]";
                 }
             }
 

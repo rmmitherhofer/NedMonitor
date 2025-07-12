@@ -30,4 +30,8 @@ public class ExecutionModeSettings
     /// Enables logging of outgoing HttpClient requests.
     /// </summary>
     public bool EnableMonitorHttpRequests { get; set; }
+    /// <summary>
+    /// Enables logging and monitoring of database queries (Entity Framework, Dapper, etc.).
+    /// </summary>
+    public bool EnableMonitorDbQueries { get; set; }
 }

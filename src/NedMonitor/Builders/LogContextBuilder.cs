@@ -7,7 +7,7 @@ using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
-using NedMonitor.Models;
+using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
 
@@ -29,6 +29,7 @@ public class LogContextBuilder : ILogContextBuilder
     private IEnumerable<Notification>? _notifications;
     private IEnumerable<LogEntry>? _logEntries;
     private IEnumerable<HttpRequestLogContext>? _httpClientLogs;
+    private IEnumerable<DbQueryEntry>? _dbQueryEntries;
     private Exception? _exception;
 
     /// <summary>
@@ -88,6 +89,15 @@ public class LogContextBuilder : ILogContextBuilder
         _httpClientLogs = _snapshot.HttpClientLogs;
         return this;
     }
+    /// <summary>
+    /// Includes database query logs (e.g., from EF or Dapper) in the current log context,
+    /// enabling detailed tracking of executed SQL statements during the request lifecycle.
+    /// </summary>
+    public ILogContextBuilder WithDbQueryLogs()
+    {
+        _dbQueryEntries = _snapshot.DbQueryEntries;
+        return this;
+    }
 
     /// <summary>
     /// Finalizes the builder configuration and returns a fully populated <see cref="LogContextHttpRequest"/> object.
@@ -112,6 +122,7 @@ public class LogContextBuilder : ILogContextBuilder
             Notifications = AddNotifications(),
             Exceptions = AddExceptions(),
             HttpClientLogs = AddHttpClientLogs(),
+            DbQueryEntries = AddDbQueryEntries(),
             LogAttentionLevel = _logLevel.Map(),
             ErrorCategory = _errorCategory
         };
@@ -126,16 +137,43 @@ public class LogContextBuilder : ILogContextBuilder
         Id = _settings.ProjectId,
         Name = _settings.Name,
         Type = _settings.ProjectType,
-        EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
-        EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,
-        EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
-        EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
-        EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
-        MaxResponseBodySizeInMb = _settings.MaxResponseBodySizeInMb,
-        CaptureResponseBody = _settings.CaptureResponseBody,
-        WritePayloadToConsole = _settings.WritePayloadToConsole,
-        SensitiveKeys = _settings.SensitiveDataMasker?.SensitiveKeys ?? [],
-        ExpectedExceptions = _settings.ExpectedExceptions ?? [],
+        ExecutionMode = new() {
+            EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
+            EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
+            EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,           
+            EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
+            EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
+            EnableMonitorDbQueries = _settings.ExecutionMode.EnableMonitorDbQueries,
+        },
+        HttpLogging = new()
+        {
+            MaxResponseBodySizeInMb = _settings.HttpLogging.MaxResponseBodySizeInMb,
+            CaptureResponseBody = _settings.HttpLogging.CaptureResponseBody,
+            WritePayloadToConsole = _settings.HttpLogging.WritePayloadToConsole,
+        },
+        SensitiveDataMasking = new()
+        {
+            Enabled = _settings.SensitiveDataMasking?.Enabled ?? false,
+            SensitiveKeys = _settings.SensitiveDataMasking?.SensitiveKeys,
+        },
+        Exceptions = new()
+        {
+            Expected = _settings.Exceptions.Expected
+        },
+        DataInterceptors = new()
+        {
+            Dapper = new()
+            {
+                Enabled = _settings.DataInterceptors?.Dapper.Enabled ?? false,
+                CaptureOptions = _settings.DataInterceptors?.Dapper.CaptureOptions,
+            },
+            EF = new()
+            {
+                Enabled = _settings.DataInterceptors?.EF.Enabled ?? false,
+                CaptureOptions = _settings.DataInterceptors?.EF.CaptureOptions,
+            }
+        },
+        MinimumLogLevel = _settings.MinimumLogLevel
     };
 
     /// <summary>
@@ -231,9 +269,9 @@ public class LogContextBuilder : ILogContextBuilder
     private DiagnosticHttpRequest AddDiagnostics() => new()
     {
         MemoryUsageMb = _snapshot.MemoryUsageMb,
-        DbQueryCount = 0,
-        CacheHit = false,
-        Dependencies = []
+        DbQueryCount = _snapshot.DbQueryCount,
+        CacheHit = _snapshot.CacheHit,
+        Dependencies = AddDependencies()
     };
 
     /// <summary>
@@ -254,6 +292,25 @@ public class LogContextBuilder : ILogContextBuilder
             MemberName = e.MemberName,
             SourceLineNumber = e.LineNumber,
             Timestamp = e.DateTime
+        });
+    }
+
+
+    private IEnumerable<DbQueryEntryHttpRequest> AddDbQueryEntries()
+    {
+        if (_dbQueryEntries?.Any() != true) return [];
+
+        return _dbQueryEntries.Select(e => new DbQueryEntryHttpRequest
+        {
+            Sql = e.Sql,
+            Parameters = e.Parameters,
+            Success = e.Success,
+            DbContext = e.DbContext,
+            ExecutedAtUtc = e.ExecutedAtUtc,
+            DurationMs = e.DurationMs,
+            ExceptionMessage = e.ExceptionMessage,
+            ORM = e.ORM,
+
         });
     }
 
@@ -330,6 +387,19 @@ public class LogContextBuilder : ILogContextBuilder
             ExceptionMessage = n.ExceptionMessage,
             StackTrace = n.StackTrace
 
+        });
+    }
+
+    private IEnumerable<DependencyInfoHttpRequest> AddDependencies()
+    {
+        if (_snapshot.Dependencies?.Any() != true) return [];
+
+        return _snapshot.Dependencies.Select(n => new DependencyInfoHttpRequest
+        {
+           Type = n.Type,
+           Target = n.Target,
+           Success = n.Success,
+           DurationMs = n.DurationMs
         });
     }
     /// <summary>

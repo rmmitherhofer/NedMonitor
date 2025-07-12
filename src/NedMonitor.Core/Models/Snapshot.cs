@@ -215,6 +215,8 @@ public class Snapshot
     /// Domain notifications collected during the request.
     /// </summary>
     public IEnumerable<Notification>? Notifications { get; set; }
+    public IEnumerable<DbQueryEntry>? DbQueryEntries { get; set; }
+
     /// <summary>
     /// Exception thrown during the request (if any).
     /// </summary>
@@ -240,6 +242,8 @@ public class Snapshot
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY, out var responseBodySizeObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY, out var httpLogsObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_CACHEHIT_KEY, out var hit);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_COUNT_KEY, out var queryCountObj);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY, out var queryLogsObj);
 
         return new Snapshot
         {
@@ -276,7 +280,7 @@ public class Snapshot
 
             #region Diagnostic
             MemoryUsageMb = Process.GetCurrentProcess().WorkingSet64 / (1024.0 * 1024.0),
-            DbQueryCount = 0,
+            DbQueryCount = queryCountObj is int queryCount ? queryCount : 0,
             CacheHit = hit is true,
             Dependencies = httpLogsObj is List<HttpRequestLogContext> logs
                     ? logs.Select(log => new DependencyInfo
@@ -308,7 +312,8 @@ public class Snapshot
             LogEntries = LoggerAdapter.GetLogsForCurrentRequest(context),
             Notifications = notificationsObj is IEnumerable<Notification> notifications ? notifications : null,
             Exception = exceptionObj is Exception exception ? exception : null,
-            HttpClientLogs = httpLogsObj is List<HttpRequestLogContext> httpLogs ? httpLogs : null
+            HttpClientLogs = httpLogsObj is List<HttpRequestLogContext> httpLogs ? httpLogs : null,
+            DbQueryEntries = queryLogsObj is List<DbQueryEntry> queryLogEntries ? queryLogEntries : null,
         };
     }
     /// <summary>

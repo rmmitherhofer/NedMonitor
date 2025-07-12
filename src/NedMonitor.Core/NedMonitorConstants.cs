@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿namespace NedMonitor.Core;
+
+/// <summary>
 /// Contains constant keys and default sensitive terms used throughout the NedMonitor logging system.
 /// </summary>
 public static class NedMonitorConstants
@@ -33,7 +35,20 @@ public static class NedMonitorConstants
     /// </summary>
     public const string CONTEXT_LOGS_KEY = "__NedMonitor_Logger_Adapter_";
 
+    /// <summary>
+    /// Key used to store cache hit information in the HttpContext.
+    /// </summary>
     public const string CONTEXT_CACHEHIT_KEY = "NedMonitor_CacheHit";
+
+    /// <summary>
+    /// Key used to store the number of queries executed during the request.
+    /// </summary>
+    public const string CONTEXT_QUERY_COUNT_KEY = "NedMonitor_QueryCount";
+
+    /// <summary>
+    /// Key used to store detailed query logs for the request.
+    /// </summary>
+    public const string CONTEXT_QUERY_LOGS_KEY = "NedMonitor_QueryLogs";
 
     /// <summary>
     /// Default sensitive keys to be masked or excluded from logs and monitoring payloads.

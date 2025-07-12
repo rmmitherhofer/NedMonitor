@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NedMonitor.Applications;
+using NedMonitor.Core;
 using NedMonitor.Core.Settings;
 
 namespace NedMonitor.Middleware;
@@ -27,7 +28,7 @@ public class NedMonitorExceptionCaptureMiddleware
         }
         catch (Exception ex)
         {
-            bool isExpected = _settings.ExpectedExceptions?.Any(expected =>
+            bool isExpected = _settings.Exceptions.Expected?.Any(expected =>
                 ex.GetType().FullName?.Equals(expected, StringComparison.OrdinalIgnoreCase) == true) ?? false;
 
             if (!isExpected)

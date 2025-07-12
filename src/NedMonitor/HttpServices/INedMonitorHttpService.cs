@@ -1,4 +1,4 @@
-﻿using NedMonitor.Models;
+﻿using NedMonitor.HttpRequests;
 
 namespace NedMonitor.HttpServices;
 

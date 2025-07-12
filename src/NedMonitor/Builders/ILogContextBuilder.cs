@@ -1,5 +1,5 @@
 ﻿using NedMonitor.Core.Models;
-using NedMonitor.Models;
+using NedMonitor.HttpRequests;
 
 namespace NedMonitor.Builders;
 
@@ -40,6 +40,12 @@ public interface ILogContextBuilder
     /// </summary>
     /// <returns>The current builder instance.</returns>
     ILogContextBuilder WithHttpClientLogs();
+
+    /// <summary>
+    /// Includes database query logs (e.g., from EF or Dapper) in the current log context,
+    /// enabling detailed tracking of executed SQL statements during the request lifecycle.
+    /// </summary>
+    ILogContextBuilder WithDbQueryLogs();
 
     /// <summary>
     /// Builds the final <see cref="LogContextHttpRequest"/> with all collected data.

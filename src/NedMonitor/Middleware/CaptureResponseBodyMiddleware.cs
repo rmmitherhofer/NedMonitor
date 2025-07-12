@@ -35,9 +35,9 @@ public class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMon
 
         string capturedBody;
 
-        long maxSize = _settings.MaxResponseBodySizeInMb * 1024L * 1024L;
+        long maxSize = _settings.HttpLogging.MaxResponseBodySizeInMb * 1024L * 1024L;
 
-        if (_settings.CaptureResponseBody)
+        if (_settings.HttpLogging.CaptureResponseBody)
         {
             if (memoryStream.Length <= maxSize)
             {
@@ -46,7 +46,7 @@ public class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMon
             }
             else
             {
-                capturedBody = $"[Body not captured. Size exceeds limit of {_settings.MaxResponseBodySizeInMb}MB]";
+                capturedBody = $"[Body not captured. Size exceeds limit of {_settings.HttpLogging.MaxResponseBodySizeInMb}MB]";
             }
             context.Items[NedMonitorConstants.CONTEXT_REPONSE_BODY_KEY] = capturedBody;
         }

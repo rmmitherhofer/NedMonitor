@@ -2,8 +2,8 @@
 using NedMonitor.Builders;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
+using NedMonitor.HttpRequests;
 using NedMonitor.HttpServices;
-using NedMonitor.Models;
 
 namespace NedMonitor.Applications;
 
@@ -55,6 +55,8 @@ public class NedMonitorApplication : INedMonitorApplication
         if (_settings.ExecutionMode.EnableMonitorNotifications) strategies.Add(b => b.WithNotifications());
 
         if (_settings.ExecutionMode.EnableMonitorLogs) strategies.Add(b => b.WithLogEntries());
+
+        if (_settings.ExecutionMode.EnableMonitorDbQueries) strategies.Add(b => b.WithDbQueryLogs());
 
         foreach (var strategy in strategies)
             strategy(builder);
