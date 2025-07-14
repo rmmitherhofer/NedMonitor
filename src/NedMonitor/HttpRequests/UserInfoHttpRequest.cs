@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents the context information of the current user.
@@ -22,7 +22,7 @@ public class UserInfoHttpRequest
     /// <summary>
     /// The user's document.
     /// </summary>
-    [JsonPropertyName("Document")]
+    [JsonPropertyName("document")]
     public string? Document { get; set; }
 
     /// <summary>

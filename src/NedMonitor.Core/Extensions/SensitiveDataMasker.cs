@@ -1,6 +1,6 @@
-﻿using Common.Json;
-using NedMonitor.Core.Settings;
+﻿using NedMonitor.Core.Settings;
 using System.Text.Json;
+using Zypher.Json;
 
 namespace NedMonitor.Extensions;
 
@@ -11,12 +11,19 @@ namespace NedMonitor.Extensions;
 public class SensitiveDataMasker
 {
     private readonly HashSet<string> _sensitiveKeys;
+    private readonly string _maskValue;
+    private readonly bool _enabled = true;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SensitiveDataMasker"/> class.
     /// </summary>
     /// <param name="options">Options containing the list of sensitive keys to mask.</param>
-    public SensitiveDataMasker(SensitiveDataMaskerOptions options) => _sensitiveKeys = new HashSet<string>(options.SensitiveKeys, StringComparer.OrdinalIgnoreCase);
+    public SensitiveDataMasker(SensitiveDataMaskerSettings options)
+    {
+        _sensitiveKeys = new HashSet<string>(options.SensitiveKeys, StringComparer.OrdinalIgnoreCase);
+        _maskValue = options.MaskValue;
+        _enabled = options.Enabled;
+    }
 
     /// <summary>
     /// Masks sensitive data within the given object.
@@ -25,7 +32,9 @@ public class SensitiveDataMasker
     /// <returns>A new object with sensitive fields masked, or the original object if masking fails.</returns>
     public object? Mask(object? data)
     {
-        if (data == null) return null;
+        if (data is null) return null;
+
+        if (!_enabled) return data;
 
         try
         {
@@ -55,7 +64,7 @@ public class SensitiveDataMasker
                     var key = prop.Name;
                     if (_sensitiveKeys.Contains(key))
                     {
-                        obj[key] = "***REDACTED***";
+                        obj[key] = _maskValue;
                     }
                     else
                     {

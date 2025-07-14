@@ -1,7 +1,8 @@
 ﻿using NedMonitor.Core.Enums;
+using NedMonitor.Core.Models;
 using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 
 /// <summary>
@@ -9,6 +10,17 @@ namespace NedMonitor.Models;
 /// </summary>
 public class LogContextHttpRequest
 {
+    /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation started.
+    /// </summary>
+    [JsonPropertyName("startTimeUtc")]
+    public DateTime StartTimeUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation ended.
+    /// </summary>
+    [JsonPropertyName("endTimeUtc")]
+    public DateTime EndTimeUtc { get; set; }
     /// <summary>
     /// Attention level of the log.
     /// </summary>
@@ -30,8 +42,8 @@ public class LogContextHttpRequest
     /// <summary>
     /// Elapsed time of the request in milliseconds.
     /// </summary>
-    [JsonPropertyName("elapsedMilliseconds")]
-    public long ElapsedMilliseconds { get; set; }
+    [JsonPropertyName("totalMilliseconds")]
+    public double TotalMilliseconds { get; set; }
     /// <summary>
     /// Unique identifier for the request trace.
     /// </summary>
@@ -84,22 +96,26 @@ public class LogContextHttpRequest
     /// Notifications generated during the request processing.
     /// </summary>
     [JsonPropertyName("notifications")]
-    public IEnumerable<NotificationInfoHttpRequest> Notifications { get; set; }
+    public IEnumerable<NotificationInfoHttpRequest>? Notifications { get; set; }
 
     /// <summary>
     /// Detailed log entries (messages, levels, sources).
     /// </summary>
     [JsonPropertyName("logEntries")]
-    public IEnumerable<LogEntryHttpRequest> LogEntries { get; set; }
+    public IEnumerable<LogEntryHttpRequest>? LogEntries { get; set; }
 
     /// <summary>
     /// Captured exception details during processing.
     /// </summary>
     [JsonPropertyName("exceptions")]
-    public IEnumerable<ExceptionInfoHttpRequest> Exceptions { get; set; }
+    public IEnumerable<ExceptionInfoHttpRequest>? Exceptions { get; set; }
     /// <summary>
     /// Logs related to outbound HTTP client calls made during the request.
     /// </summary>
     [JsonPropertyName("httpClientLogs")]
-    public IEnumerable<HttpClientLogInfoHttpRequest> HttpClientLogs { get; set; }
+    public IEnumerable<HttpClientLogInfoHttpRequest>? HttpClientLogs { get; set; }
+
+
+    [JsonPropertyName("dbQueryEntries")]
+    public IEnumerable<DbQueryEntryHttpRequest>? DbQueryEntries { get; set; }
 }

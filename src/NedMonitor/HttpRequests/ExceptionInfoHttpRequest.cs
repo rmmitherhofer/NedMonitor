@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents detailed information about an exception.
@@ -30,4 +30,16 @@ public class ExceptionInfoHttpRequest
     /// </summary>
     [JsonPropertyName("innerException")]
     public string? InnerException { get; set; }
+
+    /// <summary>
+    /// Timestamp (UTC) when the exception was captured.
+    /// </summary>
+    [JsonPropertyName("timestampUtc")]
+    public DateTime TimestampUtc { get; set; }
+
+    /// <summary>
+    /// Optional context or source where the exception was thrown (e.g., class/method name).
+    /// </summary>
+    [JsonPropertyName("source")]
+    public string? Source { get; set; }
 }

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeReferencedProjects>true</IncludeReferencedProjects>
+
+		<PackageId>NedMonitor.Dapper</PackageId>
+		<Version>1.0.1-dev</Version>
+		<Authors>Renato Mitherhofer</Authors>
+		
+		<Title>NedMonitor Dapper Interceptors</Title>
+		<Description>Dapper interceptors for monitoring, logging, and telemetry of database queries in NedMonitor.</Description>
+		<PackageTags>dapper;nedmonitor;monitoring;logging;interceptors;telemetry;database;performance</PackageTags>
+
+		<PackageProjectUrl>https://github.com/rmmitherhofer/NedMonitor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/rmmitherhofer/NedMonitor</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>© 2025 Renato Mitherhofer</Copyright>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net9.0" />
+		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="NedMonitor.Core" Version="1.0.1" />
+	</ItemGroup>
+</Project>

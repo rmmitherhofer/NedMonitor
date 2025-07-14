@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents a single log entry with detailed information.
@@ -47,6 +47,6 @@ public class LogEntryHttpRequest
     /// <summary>
     /// Timestamp when the log entry was created.
     /// </summary>
-    [JsonPropertyName("timestamp")]
-    public DateTime Timestamp { get; set; }
+    [JsonPropertyName("timestampUtc")]
+    public DateTime TimestampUtc { get; set; }
 }

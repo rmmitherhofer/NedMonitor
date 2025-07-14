@@ -1,10 +1,10 @@
-﻿using Common.Extensions;
-using Common.Json;
-using Common.Notifications.Messages;
-using Common.User.Extensions;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Adapters;
 using System.Diagnostics;
+using Zypher.Extensions.Core;
+using Zypher.Json;
+using Zypher.Notifications.Messages;
+using Zypher.User.Extensions;
 
 namespace NedMonitor.Core.Models;
 
@@ -184,6 +184,16 @@ public class Snapshot
     #endregion
 
     /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation started.
+    /// </summary>
+    public DateTime StartTimeUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation ended.
+    /// </summary>
+    public DateTime EndTimeUtc { get; set; }
+
+    /// <summary>
     /// Correlation ID for distributed tracing.
     /// </summary>
     public string CorrelationId { get; set; }
@@ -206,7 +216,7 @@ public class Snapshot
     /// <summary>
     /// The total duration of the request in milliseconds.
     /// </summary>
-    public long ElapsedMilliseconds { get; set; }
+    public double TotalMilliseconds { get; set; }
     /// <summary>
     /// List of log entries captured during the request.
     /// </summary>
@@ -215,20 +225,25 @@ public class Snapshot
     /// Domain notifications collected during the request.
     /// </summary>
     public IEnumerable<Notification>? Notifications { get; set; }
+    public IEnumerable<DbQueryEntry>? DbQueryEntries { get; set; }
+
     /// <summary>
     /// Exception thrown during the request (if any).
     /// </summary>
-    public Exception? Exception { get; set; }
+    public ExceptionInfo? Exception { get; set; }
 
     public List<HttpRequestLogContext>? HttpClientLogs { get; set; }
 
     /// <summary>
-    /// Captures the full snapshot of the request lifecycle including request, response, user, diagnostics, and logs.
+    /// Captures the full snapshot of the HTTP request lifecycle, including request, response, user information,
+    /// diagnostics, and logs.
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
-    /// <param name="elapsedMs">Elapsed time for the request, in milliseconds.</param>
-    /// <returns>The completed <see cref="Snapshot"/> instance.</returns>
-    public async Task<Snapshot> CaptureAsync(HttpContext context, long elapsedMs)
+    /// <param name="elapsedMs">The elapsed time for the request, in milliseconds.</param>
+    /// <param name="startTimeAt">The UTC timestamp indicating when the request started.</param>
+    /// <param name="endTimeAt">The UTC timestamp indicating when the request ended.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the completed <see cref="Snapshot"/> instance.</returns>
+    public async Task<Snapshot> CaptureAsync(HttpContext context, double elapsedMs, DateTime startTimeAt, DateTime endTimeAt)
     {
         var request = context.Request;
         var response = context.Response;
@@ -240,13 +255,17 @@ public class Snapshot
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY, out var responseBodySizeObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY, out var httpLogsObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_CACHEHIT_KEY, out var hit);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_COUNT_KEY, out var queryCountObj);
+        context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY, out var queryLogsObj);
 
         return new Snapshot
         {
+            StartTimeUtc = startTimeAt,
+            EndTimeUtc = endTimeAt,
             CorrelationId = request.GetCorrelationId(),
             TraceId = context.TraceIdentifier,
             Path = request.Path,
-            ElapsedMilliseconds = elapsedMs,
+            TotalMilliseconds = elapsedMs,
 
             #region Request
             RequestId = request.GetRequestId(),
@@ -276,7 +295,7 @@ public class Snapshot
 
             #region Diagnostic
             MemoryUsageMb = Process.GetCurrentProcess().WorkingSet64 / (1024.0 * 1024.0),
-            DbQueryCount = 0,
+            DbQueryCount = queryCountObj is int queryCount ? queryCount : 0,
             CacheHit = hit is true,
             Dependencies = httpLogsObj is List<HttpRequestLogContext> logs
                     ? logs.Select(log => new DependencyInfo
@@ -307,8 +326,9 @@ public class Snapshot
 
             LogEntries = LoggerAdapter.GetLogsForCurrentRequest(context),
             Notifications = notificationsObj is IEnumerable<Notification> notifications ? notifications : null,
-            Exception = exceptionObj is Exception exception ? exception : null,
-            HttpClientLogs = httpLogsObj is List<HttpRequestLogContext> httpLogs ? httpLogs : null
+            Exception = exceptionObj is ExceptionInfo exception ? exception : null,
+            HttpClientLogs = httpLogsObj is List<HttpRequestLogContext> httpLogs ? httpLogs : null,
+            DbQueryEntries = queryLogsObj is List<DbQueryEntry> queryLogEntries ? queryLogEntries : null,
         };
     }
     /// <summary>

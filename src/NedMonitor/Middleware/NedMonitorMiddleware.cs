@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Models;
-using NedMonitor.Models;
 using NedMonitor.Queues;
-using System;
 using System.Diagnostics;
 
 namespace NedMonitor.Middleware;
@@ -41,6 +39,7 @@ public class NedMonitorMiddleware
     /// <param name="context">The current HTTP context.</param>
     public async Task InvokeAsync(HttpContext context)
     {
+        DateTime startAt = DateTime.UtcNow;
         _diagnostic = new();
         _diagnostic.Start();
 
@@ -48,6 +47,6 @@ public class NedMonitorMiddleware
 
         _diagnostic.Stop();
 
-        _queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.ElapsedMilliseconds));
+        _queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.UtcNow));
     }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// HTTP service configuration used by NedMonitor.
 /// </summary>
-public class HttpServiceSettings
+public class RemoteServiceSettings
 {
     /// <summary>
     /// Base address of the HTTP service.
@@ -13,17 +13,17 @@ public class HttpServiceSettings
     /// <summary>
     /// Endpoint configurations available on the service.
     /// </summary>
-    public HttpServiceEndPointsSettings EndPoints { get; set; }
+    public NedMonitorEndpointsSettings Endpoints { get; set; }
 }
 
 
 /// <summary>
 /// Endpoint configurations for the NedMonitor HTTP service.
 /// </summary>
-public class HttpServiceEndPointsSettings
+public class NedMonitorEndpointsSettings
 {
     /// <summary>
     /// Endpoint used for sending notifications.
     /// </summary>
-    public string Notify { get; set; }
+    public string NotifyLogContext { get; set; }
 }

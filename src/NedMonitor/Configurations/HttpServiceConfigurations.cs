@@ -21,7 +21,7 @@ internal static class HttpServiceConfigurations
         var settings = configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE).Get<NedMonitorSettings>() ?? new();
 
         services.AddHttpClient<INedMonitorHttpService, NedMonitorHttpService>(client =>
-            client.BaseAddress = new Uri(settings.Service.BaseAddress)
+            client.BaseAddress = new Uri(settings.RemoteService.BaseAddress)
         );
 
         return services;

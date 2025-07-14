@@ -1,15 +1,15 @@
-﻿using Common.Json;
-using Common.Notifications.Messages;
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
-using NedMonitor.Models;
+using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
+using Zypher.Json;
+using Zypher.Notifications.Messages;
 
 namespace NedMonitor.Builders;
 
@@ -29,7 +29,8 @@ public class LogContextBuilder : ILogContextBuilder
     private IEnumerable<Notification>? _notifications;
     private IEnumerable<LogEntry>? _logEntries;
     private IEnumerable<HttpRequestLogContext>? _httpClientLogs;
-    private Exception? _exception;
+    private IEnumerable<DbQueryEntry>? _dbQueryEntries;
+    private ExceptionInfo? _exception;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogContextBuilder"/> class.
@@ -88,6 +89,15 @@ public class LogContextBuilder : ILogContextBuilder
         _httpClientLogs = _snapshot.HttpClientLogs;
         return this;
     }
+    /// <summary>
+    /// Includes database query logs (e.g., from EF or Dapper) in the current log context,
+    /// enabling detailed tracking of executed SQL statements during the request lifecycle.
+    /// </summary>
+    public ILogContextBuilder WithDbQueryLogs()
+    {
+        _dbQueryEntries = _snapshot.DbQueryEntries;
+        return this;
+    }
 
     /// <summary>
     /// Finalizes the builder configuration and returns a fully populated <see cref="LogContextHttpRequest"/> object.
@@ -98,9 +108,11 @@ public class LogContextBuilder : ILogContextBuilder
     {
         return new LogContextHttpRequest
         {
+            StartTimeUtc = _snapshot.StartTimeUtc,
+            EndTimeUtc = _snapshot.EndTimeUtc,
             CorrelationId = _snapshot.CorrelationId,
             Path = _snapshot.Path,
-            ElapsedMilliseconds = _snapshot.ElapsedMilliseconds,
+            TotalMilliseconds = _snapshot.TotalMilliseconds,
             TraceIdentifier = _snapshot.TraceId,
             Project = AddProject(),
             Environment = AddEnvironment(),
@@ -112,6 +124,7 @@ public class LogContextBuilder : ILogContextBuilder
             Notifications = AddNotifications(),
             Exceptions = AddExceptions(),
             HttpClientLogs = AddHttpClientLogs(),
+            DbQueryEntries = AddDbQueryEntries(),
             LogAttentionLevel = _logLevel.Map(),
             ErrorCategory = _errorCategory
         };
@@ -126,16 +139,44 @@ public class LogContextBuilder : ILogContextBuilder
         Id = _settings.ProjectId,
         Name = _settings.Name,
         Type = _settings.ProjectType,
-        EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
-        EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,
-        EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
-        EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
-        EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
-        MaxResponseBodySizeInMb = _settings.MaxResponseBodySizeInMb,
-        CaptureResponseBody = _settings.CaptureResponseBody,
-        WritePayloadToConsole = _settings.WritePayloadToConsole,
-        SensitiveKeys = _settings.SensitiveDataMasker?.SensitiveKeys ?? [],
-        ExpectedExceptions = _settings.ExpectedExceptions ?? [],
+        ExecutionMode = new() {
+            EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
+            EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
+            EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,           
+            EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
+            EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
+            EnableMonitorDbQueries = _settings.ExecutionMode.EnableMonitorDbQueries,
+        },
+        HttpLogging = new()
+        {
+            MaxResponseBodySizeInMb = _settings.HttpLogging.MaxResponseBodySizeInMb,
+            CaptureResponseBody = _settings.HttpLogging.CaptureResponseBody,
+            WritePayloadToConsole = _settings.HttpLogging.WritePayloadToConsole,
+        },
+        SensitiveDataMasking = new()
+        {
+            Enabled = _settings.SensitiveDataMasking?.Enabled ?? false,
+            SensitiveKeys = _settings.SensitiveDataMasking?.SensitiveKeys,
+            MaskValue = _settings.SensitiveDataMasking?.MaskValue,
+        },
+        Exceptions = new()
+        {
+            Expected = _settings.Exceptions.Expected
+        },
+        DataInterceptors = new()
+        {
+            Dapper = new()
+            {
+                Enabled = _settings.DataInterceptors?.Dapper.Enabled ?? false,
+                CaptureOptions = _settings.DataInterceptors?.Dapper.CaptureOptions,
+            },
+            EF = new()
+            {
+                Enabled = _settings.DataInterceptors?.EF.Enabled ?? false,
+                CaptureOptions = _settings.DataInterceptors?.EF.CaptureOptions,
+            }
+        },
+        MinimumLogLevel = _settings.MinimumLogLevel
     };
 
     /// <summary>
@@ -231,9 +272,9 @@ public class LogContextBuilder : ILogContextBuilder
     private DiagnosticHttpRequest AddDiagnostics() => new()
     {
         MemoryUsageMb = _snapshot.MemoryUsageMb,
-        DbQueryCount = 0,
-        CacheHit = false,
-        Dependencies = []
+        DbQueryCount = _snapshot.DbQueryCount,
+        CacheHit = _snapshot.CacheHit,
+        Dependencies = AddDependencies()
     };
 
     /// <summary>
@@ -253,7 +294,26 @@ public class LogContextBuilder : ILogContextBuilder
             MemberType = e.MemberType,
             MemberName = e.MemberName,
             SourceLineNumber = e.LineNumber,
-            Timestamp = e.DateTime
+            TimestampUtc = e.DateTime
+        });
+    }
+
+    private IEnumerable<DbQueryEntryHttpRequest> AddDbQueryEntries()
+    {
+        if (_dbQueryEntries?.Any() != true) return [];
+
+        return _dbQueryEntries.Select(e => new DbQueryEntryHttpRequest
+        {
+            Provider = e.Provider,
+            Sql = e.Sql,
+            Parameters = e.Parameters,
+            Success = e.Success,
+            DbContext = e.DbContext,
+            ExecutedAtUtc = e.ExecutedAtUtc,
+            DurationMs = e.DurationMs,
+            ExceptionMessage = e.ExceptionMessage,
+            ORM = e.ORM,
+
         });
     }
 
@@ -299,10 +359,12 @@ public class LogContextBuilder : ILogContextBuilder
         [
             new ExceptionInfoHttpRequest
             {
-                Type = _exception.GetType().FullName,
+                Type = _exception.Type,
                 Message = _exception.Message,
                 Tracer = _exception.StackTrace,
-                InnerException = _exception?.InnerException?.Message
+                InnerException = _exception.InnerException,
+                Source = _exception.Source,
+                TimestampUtc = _exception.TimestampUtc
             }
         ];
     }
@@ -316,8 +378,8 @@ public class LogContextBuilder : ILogContextBuilder
 
         return _httpClientLogs.Select(n => new HttpClientLogInfoHttpRequest
         {
-            StartTime = n.StartTime,
-            EndTime = n.EndTime,
+            StartTimeUtc = n.StartTime,
+            EndTimeUtc = n.EndTime,
             Method = n.Method,
             Url = n.FullUrl,
             TemplateUrl = n.UrlTemplate,
@@ -330,6 +392,19 @@ public class LogContextBuilder : ILogContextBuilder
             ExceptionMessage = n.ExceptionMessage,
             StackTrace = n.StackTrace
 
+        });
+    }
+
+    private IEnumerable<DependencyInfoHttpRequest> AddDependencies()
+    {
+        if (_snapshot.Dependencies?.Any() != true) return [];
+
+        return _snapshot.Dependencies.Select(n => new DependencyInfoHttpRequest
+        {
+           Type = n.Type,
+           Target = n.Target,
+           Success = n.Success,
+           DurationMs = n.DurationMs
         });
     }
     /// <summary>

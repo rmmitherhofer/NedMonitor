@@ -14,7 +14,7 @@ public class ExecutionModeSettings
     /// <summary>
     /// Enables capturing of unhandled exceptions.
     /// </summary>
-    public bool EnableMonitorExceptions { get; set; } = true;
+    public bool EnableMonitorExceptions { get; set; }
 
     /// <summary>
     /// Enables capturing of domain or validation notifications.
@@ -30,4 +30,8 @@ public class ExecutionModeSettings
     /// Enables logging of outgoing HttpClient requests.
     /// </summary>
     public bool EnableMonitorHttpRequests { get; set; }
+    /// <summary>
+    /// Enables logging and monitoring of database queries (Entity Framework, Dapper, etc.).
+    /// </summary>
+    public bool EnableMonitorDbQueries { get; set; }
 }

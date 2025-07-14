@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents diagnostic information about the application environment and operations.
@@ -29,5 +29,5 @@ public class DiagnosticHttpRequest
     /// List of dependencies involved in the operation.
     /// </summary>
     [JsonPropertyName("dependencies")]
-    public List<DependencyInfoHttpRequest> Dependencies { get; set; }
+    public IEnumerable<DependencyInfoHttpRequest> Dependencies { get; set; }
 }

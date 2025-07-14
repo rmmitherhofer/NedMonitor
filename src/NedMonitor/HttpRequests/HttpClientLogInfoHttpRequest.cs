@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
 
-namespace NedMonitor.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents detailed information about an HTTP request and response made through an HTTP client,
@@ -12,14 +12,14 @@ public class HttpClientLogInfoHttpRequest
     /// <summary>
     /// The UTC timestamp when the HTTP request started.
     /// </summary>
-    [JsonPropertyName("startTime")]
-    public DateTime StartTime { get; set; }
+    [JsonPropertyName("startTimeUtc")]
+    public DateTime StartTimeUtc { get; set; }
 
     /// <summary>
     /// The UTC timestamp when the HTTP response was received or the request ended.
     /// </summary>
-    [JsonPropertyName("endTime")]
-    public DateTime EndTime { get; set; }
+    [JsonPropertyName("endTimeUtc")]
+    public DateTime EndTimeUtc { get; set; }
 
     /// <summary>
     /// The HTTP method used for the request (e.g., GET, POST).
@@ -54,7 +54,7 @@ public class HttpClientLogInfoHttpRequest
     /// <summary>
     /// The response body received from the HTTP call.
     /// </summary>
-    [JsonPropertyName("ResponseBody")]
+    [JsonPropertyName("responseBody")]
     public object? ResponseBody { get; set; }
 
     /// <summary>
