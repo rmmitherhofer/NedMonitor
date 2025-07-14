@@ -5,6 +5,7 @@
 /// </summary>
 public class DbQueryEntry
 {
+    public string Provider { get; set; }
     /// <summary>
     /// The raw SQL command text executed.
     /// </summary>
@@ -23,7 +24,7 @@ public class DbQueryEntry
     /// <summary>
     /// The duration of the query execution in milliseconds (optional).
     /// </summary>
-    public double? DurationMs { get; set; }
+    public double DurationMs { get; set; }
 
     /// <summary>
     /// Indicates whether the query execution was successful.

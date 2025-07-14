@@ -1,18 +1,19 @@
-﻿using Api.Responses;
-using Common.Extensions;
-using Common.Http;
-using Common.Http.Exceptions;
-using Common.Http.Extensions;
-using Common.Json;
-using Common.Logs.Extensions;
-using Common.Notifications.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
+using Zypher.Extensions.Core;
+using Zypher.Http;
+using Zypher.Http.Exceptions;
+using Zypher.Http.Extensions;
+using Zypher.Json;
+using Zypher.Logs.Extensions;
+using Zypher.Notifications.Interfaces;
+using Zypher.Responses;
 
 namespace NedMonitor.HttpServices;
 
@@ -46,29 +47,40 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
     /// <param name="log">The structured log payload to send to NedMonitor.</param>
     public async Task Flush(LogContextHttpRequest log)
     {
-        var uri = _settings.RemoteService.EndPoints.NotifyLogContext;
-
-        var content = JsonExtensions.SerializeContent(log);
-
-        if (_settings.HttpLogging.WritePayloadToConsole)
-            EnableLogHeadersAndBody();
-
-        AddDefaultHeaders(log);
-
-        LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
-
-        var response = await _httpClient.PostAsync(uri, content);
-
-        LogResponse(response);
-
         try
         {
+            var uri = _settings.RemoteService.Endpoints.NotifyLogContext;
+
+            var content = JsonExtensions.SerializeContent(log);
+
+            if (_settings.HttpLogging.WritePayloadToConsole)
+                EnableLogHeadersAndBody();
+
+            AddDefaultHeaders(log);
+
+
+
+            Console.WriteLine(JsonExtensions.Serialize(log, new()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            }));
+
+            //LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
+
+            var response = await _httpClient.PostAsync(uri, content);
+
+            LogResponse(response);
+
             if (response.HasErrors())
                 await Print(response);
         }
         catch (CustomHttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogFail($"{log.CorrelationId}|" + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCrit($"{log.CorrelationId}|" + ex.Message);
         }
     }
     /// <summary>

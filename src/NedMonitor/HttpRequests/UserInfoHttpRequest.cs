@@ -22,7 +22,7 @@ public class UserInfoHttpRequest
     /// <summary>
     /// The user's document.
     /// </summary>
-    [JsonPropertyName("Document")]
+    [JsonPropertyName("document")]
     public string? Document { get; set; }
 
     /// <summary>

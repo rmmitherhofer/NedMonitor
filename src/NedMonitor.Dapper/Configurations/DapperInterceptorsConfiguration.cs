@@ -1,7 +1,7 @@
-﻿using Common.Extensions;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using NedMonitor.DataInterceptors.Middleware;
+using Zypher.Extensions.Core;
 
 namespace NedMonitor.DataInterceptors.Configurations;
 

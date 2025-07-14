@@ -1,7 +1,4 @@
-﻿using Common.Extensions;
-using Common.Http.Configurations;
-using Common.Notifications.Configurations;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +11,12 @@ using NedMonitor.Builders;
 using NedMonitor.Core;
 using NedMonitor.Core.Settings;
 using NedMonitor.Extensions;
-using NedMonitor.Http.Handlers;
 using NedMonitor.Middleware;
 using NedMonitor.Providers;
 using NedMonitor.Queues;
-using System.IO.Pipes;
+using Zypher.Extensions.Core;
+using Zypher.Http.Configurations;
+using Zypher.Notifications.Configurations;
 
 namespace NedMonitor.Configurations;
 
@@ -61,7 +59,13 @@ public static class NedMonitorConfigurations
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
 
-        services.Configure<NedMonitorSettings>(configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE));
+        services
+            .AddOptions<NedMonitorSettings>()
+            .Bind(configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE))
+            .ValidateOnStart();
+
+
+        services.TryAddSingleton<IValidateOptions<NedMonitorSettings>, NedMonitorSettingsValidation>();
 
         services.PostConfigure<NedMonitorSettings>(settings =>
         {
@@ -113,8 +117,6 @@ public static class NedMonitorConfigurations
 
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>();
-
-        services.TryAddTransient<NedMonitorHttpLoggingHandler>();
 
         if (!settings.Value.ExecutionMode.EnableNedMonitor) return services; 
 

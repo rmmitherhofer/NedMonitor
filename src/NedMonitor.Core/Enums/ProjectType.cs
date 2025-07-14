@@ -5,6 +5,7 @@
 /// </summary>
 public enum ProjectType
 {
+    Undefined = 0,
     /// <summary>
     /// Web application project type.
     /// </summary>

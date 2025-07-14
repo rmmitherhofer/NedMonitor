@@ -13,13 +13,13 @@ public class ProjectInfoHttp
     /// <summary>
     /// Unique identifier for the project.
     /// </summary>
-    [JsonPropertyName("projectId")]
+    [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
     /// <summary>
     /// Type of the project (defined by the <see cref="ProjectType"/> enum).
     /// </summary>
-    [JsonPropertyName("projectType")]
+    [JsonPropertyName("type")]
     public ProjectType Type { get; set; }
 
     /// <summary>

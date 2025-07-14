@@ -10,6 +10,12 @@ public class DbQueryEntryHttpRequest
     /// <summary>
     /// The raw SQL command text executed.
     /// </summary>
+    [JsonPropertyName("provider")]
+    public string Provider { get; set; }
+
+    /// <summary>
+    /// The raw SQL command text executed.
+    /// </summary>
     [JsonPropertyName("sql")]
     public string? Sql { get; set; }
 
@@ -29,7 +35,7 @@ public class DbQueryEntryHttpRequest
     /// The duration of the query execution in milliseconds (optional).
     /// </summary>
     [JsonPropertyName("durationMs")]
-    public double? DurationMs { get; set; }
+    public double DurationMs { get; set; }
 
     /// <summary>
     /// Indicates whether the query execution was successful.

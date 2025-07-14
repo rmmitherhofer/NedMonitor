@@ -4,14 +4,25 @@
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<IncludeReferencedProjects>true</IncludeReferencedProjects>
-		<PackageId>NedMonitor</PackageId>
-		<Version>9.2.0</Version>
-		<Authors>Renato Mitherhofer</Authors>
-	</PropertyGroup>
 
-	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeReferencedProjects>true</IncludeReferencedProjects>
+
+		<PackageId>NedMonitor</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Renato Mitherhofer</Authors>
+
+		<Title>NedMonitor Core Monitoring Library</Title>
+		<Description>Core library for the NedMonitor ecosystem, providing monitoring and logging capabilities for .NET applications.</Description>
+		<PackageTags>Monitoring;Logging;Telemetry;NedMonitor;Observability</PackageTags>
+
+		<PackageProjectUrl>https://github.com/rmmitherhofer/NedMonitor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/rmmitherhofer/NedMonitor</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>© 2025 Renato Mitherhofer</Copyright>
+
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
@@ -22,6 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NedMonitor.Http" Version="9.2.0" />
+	  <PackageReference Include="NedMonitor.Core" Version="1.0.0" />
 	</ItemGroup>
 </Project>

@@ -4,14 +4,25 @@
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<IncludeReferencedProjects>true</IncludeReferencedProjects>
-		<PackageId>NedMonitor.Core</PackageId>
-		<Version>9.2.0</Version>
-		<Authors>Renato Mitherhofer</Authors>
-	</PropertyGroup>
 
-	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeReferencedProjects>true</IncludeReferencedProjects>
+
+		<PackageId>NedMonitor.Core</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Renato Mitherhofer</Authors>
+
+		<Title>NedMonitor.Core - Centralized Monitoring Library</Title>
+		<Description>Core library for NedMonitor, providing centralized application monitoring and telemetry features.</Description>
+		<PackageTags>monitoring;logging;telemetry;nedmonitor;diagnostics;zypher</PackageTags>
+
+		<PackageProjectUrl>https://github.com/rmmitherhofer/NedMonitor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/rmmitherhofer/NedMonitor</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>© 2025 Renato Mitherhofer</Copyright>
+
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
@@ -22,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MitherPack.Common.Http" Version="9.1.1" />
+		<PackageReference Include="Zypher.Http" Version="1.0.1" />
 	</ItemGroup>
 
 </Project>

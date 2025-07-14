@@ -1,11 +1,11 @@
-﻿using Common.Extensions;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NedMonitor.Core.Helpers;
 using NedMonitor.Core.Interfaces;
 using NedMonitor.DataInterceptors.Middleware;
 using NedMonitor.EF.Interceptors;
+using Zypher.Extensions.Core;
 
 namespace NedMonitor.EF.Configurations;
 

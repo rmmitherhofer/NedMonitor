@@ -11,6 +11,17 @@ namespace NedMonitor.HttpRequests;
 public class LogContextHttpRequest
 {
     /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation started.
+    /// </summary>
+    [JsonPropertyName("startTimeUtc")]
+    public DateTime StartTimeUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp indicating when the operation ended.
+    /// </summary>
+    [JsonPropertyName("endTimeUtc")]
+    public DateTime EndTimeUtc { get; set; }
+    /// <summary>
     /// Attention level of the log.
     /// </summary>
     [JsonPropertyName("logAttentionLevel")]
@@ -31,8 +42,8 @@ public class LogContextHttpRequest
     /// <summary>
     /// Elapsed time of the request in milliseconds.
     /// </summary>
-    [JsonPropertyName("elapsedMilliseconds")]
-    public long ElapsedMilliseconds { get; set; }
+    [JsonPropertyName("totalMilliseconds")]
+    public double TotalMilliseconds { get; set; }
     /// <summary>
     /// Unique identifier for the request trace.
     /// </summary>

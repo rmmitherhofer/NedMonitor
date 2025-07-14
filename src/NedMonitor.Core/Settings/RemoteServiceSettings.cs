@@ -13,7 +13,7 @@ public class RemoteServiceSettings
     /// <summary>
     /// Endpoint configurations available on the service.
     /// </summary>
-    public NedMonitorEndpointsSettings EndPoints { get; set; }
+    public NedMonitorEndpointsSettings Endpoints { get; set; }
 }
 
 

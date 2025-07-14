@@ -9,10 +9,10 @@ public class DataInterceptorsSettings
     /// <summary>
     /// Settings for the Entity Framework Core interceptor.
     /// </summary>
-    public EfInterceptorSettings EF { get; set; }
+    public EfInterceptorSettings EF { get; set; } = new();
 
     /// <summary>
     /// Settings for the Dapper interceptor.
     /// </summary>
-    public DapperInterceptorSettings Dapper { get; set; }
+    public DapperInterceptorSettings Dapper { get; set; } = new();
 }

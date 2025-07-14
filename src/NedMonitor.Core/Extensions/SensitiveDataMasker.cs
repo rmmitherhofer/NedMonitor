@@ -1,6 +1,6 @@
-﻿using Common.Json;
-using NedMonitor.Core.Settings;
+﻿using NedMonitor.Core.Settings;
 using System.Text.Json;
+using Zypher.Json;
 
 namespace NedMonitor.Extensions;
 

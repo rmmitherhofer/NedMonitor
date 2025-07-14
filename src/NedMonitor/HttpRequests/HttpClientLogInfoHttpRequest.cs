@@ -54,7 +54,7 @@ public class HttpClientLogInfoHttpRequest
     /// <summary>
     /// The response body received from the HTTP call.
     /// </summary>
-    [JsonPropertyName("ResponseBody")]
+    [JsonPropertyName("responseBody")]
     public object? ResponseBody { get; set; }
 
     /// <summary>

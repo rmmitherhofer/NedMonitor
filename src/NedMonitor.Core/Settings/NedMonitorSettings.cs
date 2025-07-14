@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NedMonitor.Core.Enums;
 using System.Reflection;
-using System.Text.Json.Serialization;
 
 namespace NedMonitor.Core.Settings;
 
@@ -32,6 +32,12 @@ public class NedMonitorSettings
     public string Name { get; } = Assembly.GetEntryAssembly().GetName().Name;
 
     /// <summary>
+    /// Defines the minimum log level to be captured and stored during a request lifecycle.
+    /// Log entries below this level will be ignored.
+    /// </summary>
+    public LogLevel MinimumLogLevel { get; set; } = LogLevel.Information;
+
+    /// <summary>
     /// Defines the execution mode settings that control how NedMonitor behaves during runtime,
     /// such as which features to enable (e.g., logging, notifications, exceptions).
     /// </summary>
@@ -45,7 +51,7 @@ public class NedMonitorSettings
     /// <summary>
     /// Configuration options for masking sensitive data in logs, such as passwords or tokens.
     /// </summary>
-    public SensitiveDataMaskerSettings? SensitiveDataMasking { get; set; }
+    public SensitiveDataMaskerSettings SensitiveDataMasking { get; set; } = new();
 
     /// <summary>
     /// Settings for expected exceptions that should not be treated as errors.
@@ -55,16 +61,10 @@ public class NedMonitorSettings
     /// <summary>
     /// Settings for intercepting and logging database operations (EF and Dapper).
     /// </summary>
-    public DataInterceptorsSettings DataInterceptors { get; set; }
+    public DataInterceptorsSettings DataInterceptors { get; set; } = new();
 
     /// <summary>
     /// HTTP service-specific settings for NedMonitor (e.g., base address, endpoints).
     /// </summary>
     public RemoteServiceSettings RemoteService { get; set; }
-
-    /// <summary>
-    /// Defines the minimum log level to be captured and stored during a request lifecycle.
-    /// Log entries below this level will be ignored.
-    /// </summary>
-    public LogLevel MinimumLogLevel { get; set; } = LogLevel.Information;
 }

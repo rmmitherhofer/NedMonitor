@@ -22,14 +22,12 @@ public sealed class EfQueryCounter : DbCommandInterceptor
     private readonly EfInterceptorSettings _efSettings;
     private readonly IQueryCounter _counter;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ILogger<EfQueryCounter> _logger;
 
-    public EfQueryCounter(IQueryCounter counter, IHttpContextAccessor httpContextAccessor, IOptions<NedMonitorSettings> options, ILogger<EfQueryCounter> logger)
+    public EfQueryCounter(IQueryCounter counter, IHttpContextAccessor httpContextAccessor, IOptions<NedMonitorSettings> options)
     {
         _counter = counter;
         _httpContextAccessor = httpContextAccessor;
         _efSettings = options.Value.DataInterceptors.EF;
-        _logger = logger;
     }
 
     /// <summary>
@@ -48,7 +46,7 @@ public sealed class EfQueryCounter : DbCommandInterceptor
     private void AddLog(DbCommand command, bool success, string? exceptionMessage, double? durationMs)
     {
         if (!_efSettings.Enabled.GetValueOrDefault()) return;
-        if (_efSettings.CaptureOptions is null || _efSettings.CaptureOptions.Contains(CaptureOptions.None)) return;
+        if (_efSettings.CaptureOptions?.Any() != true || _efSettings.CaptureOptions.Contains(CaptureOptions.None)) return;
 
         var context = _httpContextAccessor.HttpContext;
 
@@ -58,8 +56,9 @@ public sealed class EfQueryCounter : DbCommandInterceptor
 
         var entry = new DbQueryEntry
         {
+            Provider = DbProviderExtractor.GetFriendlyProviderName(command.Connection),
             ExecutedAtUtc = DateTime.UtcNow,
-            DurationMs = durationMs,
+            DurationMs = durationMs ?? 0,
             Success = success,
             ORM = $"EF Core {OrmVersionCache.EfVersion}"
         };

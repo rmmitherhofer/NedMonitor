@@ -14,7 +14,7 @@ public class ExecutionModeSettings
     /// <summary>
     /// Enables capturing of unhandled exceptions.
     /// </summary>
-    public bool EnableMonitorExceptions { get; set; } = true;
+    public bool EnableMonitorExceptions { get; set; }
 
     /// <summary>
     /// Enables capturing of domain or validation notifications.

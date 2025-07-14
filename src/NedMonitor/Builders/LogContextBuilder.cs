@@ -1,6 +1,4 @@
-﻿using Common.Json;
-using Common.Notifications.Messages;
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NedMonitor.Core.Extensions;
@@ -10,6 +8,8 @@ using NedMonitor.Extensions;
 using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
+using Zypher.Json;
+using Zypher.Notifications.Messages;
 
 namespace NedMonitor.Builders;
 
@@ -108,9 +108,11 @@ public class LogContextBuilder : ILogContextBuilder
     {
         return new LogContextHttpRequest
         {
+            StartTimeUtc = _snapshot.StartTimeUtc,
+            EndTimeUtc = _snapshot.EndTimeUtc,
             CorrelationId = _snapshot.CorrelationId,
             Path = _snapshot.Path,
-            ElapsedMilliseconds = _snapshot.ElapsedMilliseconds,
+            TotalMilliseconds = _snapshot.TotalMilliseconds,
             TraceIdentifier = _snapshot.TraceId,
             Project = AddProject(),
             Environment = AddEnvironment(),
@@ -295,13 +297,13 @@ public class LogContextBuilder : ILogContextBuilder
         });
     }
 
-
     private IEnumerable<DbQueryEntryHttpRequest> AddDbQueryEntries()
     {
         if (_dbQueryEntries?.Any() != true) return [];
 
         return _dbQueryEntries.Select(e => new DbQueryEntryHttpRequest
         {
+            Provider = e.Provider,
             Sql = e.Sql,
             Parameters = e.Parameters,
             Success = e.Success,
