@@ -5,7 +5,6 @@ using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using Zypher.Extensions.Core;
 using Zypher.Http;
 using Zypher.Http.Exceptions;
@@ -53,19 +52,9 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
 
             var content = JsonExtensions.SerializeContent(log);
 
-            if (_settings.HttpLogging.WritePayloadToConsole)
-                EnableLogHeadersAndBody();
-
             AddDefaultHeaders(log);
 
-
-
-            Console.WriteLine(JsonExtensions.Serialize(log, new()
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            }));
-
-            //LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
+            LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
 
             var response = await _httpClient.PostAsync(uri, content);
 

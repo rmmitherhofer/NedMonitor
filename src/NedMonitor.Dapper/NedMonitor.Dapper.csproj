@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.Dapper</PackageId>
-		<Version>1.0.0-dev</Version>
+		<Version>1.0.1-dev</Version>
 		<Authors>Renato Mitherhofer</Authors>
 		
 		<Title>NedMonitor Dapper Interceptors</Title>
@@ -37,6 +37,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
-		<PackageReference Include="NedMonitor.Core" Version="1.0.0" />
+		<PackageReference Include="NedMonitor.Core" Version="1.0.1" />
 	</ItemGroup>
 </Project>

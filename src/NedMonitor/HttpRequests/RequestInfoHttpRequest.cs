@@ -105,6 +105,6 @@ public class RequestInfoHttpRequest
     /// <summary>
     /// The IP address of the request origin.
     /// </summary>
-    [JsonPropertyName("IpAddress")]
+    [JsonPropertyName("ipAddress")]
     public string? IpAddress { get; set; }
 }

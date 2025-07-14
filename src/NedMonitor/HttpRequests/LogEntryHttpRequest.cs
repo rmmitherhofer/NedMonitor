@@ -47,6 +47,6 @@ public class LogEntryHttpRequest
     /// <summary>
     /// Timestamp when the log entry was created.
     /// </summary>
-    [JsonPropertyName("timestamp")]
-    public DateTime Timestamp { get; set; }
+    [JsonPropertyName("timestampUtc")]
+    public DateTime TimestampUtc { get; set; }
 }

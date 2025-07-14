@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using NedMonitor.Applications;
 using NedMonitor.Core;
+using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
 
 namespace NedMonitor.Middleware;
@@ -32,8 +33,17 @@ public class NedMonitorExceptionCaptureMiddleware
                 ex.GetType().FullName?.Equals(expected, StringComparison.OrdinalIgnoreCase) == true) ?? false;
 
             if (!isExpected)
-                context.Items[NedMonitorConstants.CONTEXT_EXCEPTION_KEY] = ex;
-
+            {
+                context.Items[NedMonitorConstants.CONTEXT_EXCEPTION_KEY] = new ExceptionInfo()
+                {
+                    Type = ex.GetType().FullName!,
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message,
+                    Source = ex.Source,
+                    TimestampUtc = DateTime.UtcNow
+                };
+            }
             throw;
         }
     }

@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.EF</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Renato Mitherhofer</Authors>
 
 		<Title>NedMonitor Entity Framework Extensions</Title>
@@ -41,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NedMonitor.Core" Version="1.0.0" />
+	  <PackageReference Include="NedMonitor.Core" Version="1.0.1" />
 	</ItemGroup>
 
 </Project>

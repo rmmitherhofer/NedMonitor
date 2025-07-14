@@ -1,45 +1,37 @@
-﻿using System.Text.Json.Serialization;
-
-namespace NedMonitor.HttpRequests;
+﻿namespace NedMonitor.Core.Models;
 
 /// <summary>
-/// Represents detailed information about an exception.
+/// Represents a single exception captured by NedMonitor.
 /// </summary>
-public class ExceptionInfoHttpRequest
+public class ExceptionInfo
 {
     /// <summary>
-    /// The type or class name of the exception.
+    /// The full type name of the exception (e.g., System.NullReferenceException).
     /// </summary>
-    [JsonPropertyName("type")]
     public string Type { get; set; }
 
     /// <summary>
     /// The exception message.
     /// </summary>
-    [JsonPropertyName("message")]
     public string Message { get; set; }
 
     /// <summary>
-    /// Optional stack trace or tracer information.
+    /// The full stack trace if available.
     /// </summary>
-    [JsonPropertyName("tracer")]
-    public string? Tracer { get; set; }
+    public string? StackTrace { get; set; }
 
     /// <summary>
-    /// Optional detailed additional information about the exception.
+    /// Serialized inner exception, if any.
     /// </summary>
-    [JsonPropertyName("innerException")]
     public string? InnerException { get; set; }
 
     /// <summary>
     /// Timestamp (UTC) when the exception was captured.
     /// </summary>
-    [JsonPropertyName("timestampUtc")]
     public DateTime TimestampUtc { get; set; }
 
     /// <summary>
     /// Optional context or source where the exception was thrown (e.g., class/method name).
     /// </summary>
-    [JsonPropertyName("source")]
     public string? Source { get; set; }
 }

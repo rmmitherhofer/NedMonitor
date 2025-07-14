@@ -30,7 +30,7 @@ public class LogContextBuilder : ILogContextBuilder
     private IEnumerable<LogEntry>? _logEntries;
     private IEnumerable<HttpRequestLogContext>? _httpClientLogs;
     private IEnumerable<DbQueryEntry>? _dbQueryEntries;
-    private Exception? _exception;
+    private ExceptionInfo? _exception;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogContextBuilder"/> class.
@@ -157,6 +157,7 @@ public class LogContextBuilder : ILogContextBuilder
         {
             Enabled = _settings.SensitiveDataMasking?.Enabled ?? false,
             SensitiveKeys = _settings.SensitiveDataMasking?.SensitiveKeys,
+            MaskValue = _settings.SensitiveDataMasking?.MaskValue,
         },
         Exceptions = new()
         {
@@ -293,7 +294,7 @@ public class LogContextBuilder : ILogContextBuilder
             MemberType = e.MemberType,
             MemberName = e.MemberName,
             SourceLineNumber = e.LineNumber,
-            Timestamp = e.DateTime
+            TimestampUtc = e.DateTime
         });
     }
 
@@ -358,10 +359,12 @@ public class LogContextBuilder : ILogContextBuilder
         [
             new ExceptionInfoHttpRequest
             {
-                Type = _exception.GetType().FullName,
+                Type = _exception.Type,
                 Message = _exception.Message,
                 Tracer = _exception.StackTrace,
-                InnerException = _exception?.InnerException?.Message
+                InnerException = _exception.InnerException,
+                Source = _exception.Source,
+                TimestampUtc = _exception.TimestampUtc
             }
         ];
     }
@@ -375,8 +378,8 @@ public class LogContextBuilder : ILogContextBuilder
 
         return _httpClientLogs.Select(n => new HttpClientLogInfoHttpRequest
         {
-            StartTime = n.StartTime,
-            EndTime = n.EndTime,
+            StartTimeUtc = n.StartTime,
+            EndTimeUtc = n.EndTime,
             Method = n.Method,
             Url = n.FullUrl,
             TemplateUrl = n.UrlTemplate,

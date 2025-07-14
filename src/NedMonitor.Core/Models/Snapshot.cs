@@ -230,7 +230,7 @@ public class Snapshot
     /// <summary>
     /// Exception thrown during the request (if any).
     /// </summary>
-    public Exception? Exception { get; set; }
+    public ExceptionInfo? Exception { get; set; }
 
     public List<HttpRequestLogContext>? HttpClientLogs { get; set; }
 
@@ -326,7 +326,7 @@ public class Snapshot
 
             LogEntries = LoggerAdapter.GetLogsForCurrentRequest(context),
             Notifications = notificationsObj is IEnumerable<Notification> notifications ? notifications : null,
-            Exception = exceptionObj is Exception exception ? exception : null,
+            Exception = exceptionObj is ExceptionInfo exception ? exception : null,
             HttpClientLogs = httpLogsObj is List<HttpRequestLogContext> httpLogs ? httpLogs : null,
             DbQueryEntries = queryLogsObj is List<DbQueryEntry> queryLogEntries ? queryLogEntries : null,
         };
