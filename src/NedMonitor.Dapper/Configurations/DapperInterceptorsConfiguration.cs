@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NedMonitor.Core.Helpers;
+using NedMonitor.Core.Interfaces;
+using NedMonitor.Dapper.Wrappers;
 using NedMonitor.DataInterceptors.Middleware;
+using Solucao.RH.Customers.Data.TesteDapper;
 using Zypher.Extensions.Core;
 
-namespace NedMonitor.DataInterceptors.Configurations;
+namespace NedMonitor.Dapper.Configurations;
 
 public static class DapperInterceptorsConfiguration
 {
@@ -12,6 +17,9 @@ public static class DapperInterceptorsConfiguration
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
 
         services.AddHttpContextAccessor();
+
+        services.TryAddScoped<IQueryCounter, HttpContextQueryCounter>();
+        services.TryAddScoped<INedDapperWrapper, NedDapperWrapper>();
 
         return services;
     }

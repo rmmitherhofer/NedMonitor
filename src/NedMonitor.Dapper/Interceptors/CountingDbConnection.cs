@@ -57,188 +57,113 @@ public class CountingDbConnection : IDbConnection
 
     #region Dapper Intercepted Methods
 
+    #region Execute
     public int Execute(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.Execute(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+        => ExecuteWithLogging(() => _inner.Execute(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
+    #region ExecuteAsync
     public Task<int> ExecuteAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.ExecuteAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+        => ExecuteWithLoggingAsync(() => _inner.ExecuteAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public IEnumerable<T> Query<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                   bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType), sql, param);
-    }
 
-    public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                              int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QueryAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region Query
+    public IEnumerable<T> Query<T>(string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public T QueryFirst<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                           int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.QueryFirst<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
-    public Task<T> QueryFirstAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                      int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QueryFirstAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QueryAsync
+    public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) => ExecuteWithLoggingAsync(()
+        => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) => ExecuteWithLoggingAsync(()
+        => _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
 
-    public T QueryFirstOrDefault<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                    int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.QueryFirstOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #endregion
 
-    public Task<T> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                               int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QueryFirstOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QueryFirst
+    public T QueryFirst<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.QueryFirst<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public T QuerySingle<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                            int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.QuerySingle<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QueryFirstAsync
+    public Task<T> QueryFirstAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryFirstAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public Task<T> QuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                       int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QuerySingleAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QueryFirstOrDefault
+    public T? QueryFirstOrDefault<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.QueryFirstOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public T QuerySingleOrDefault<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                     int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.QuerySingleOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
 
-    public Task<T> QuerySingleOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null,
-                                                int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QuerySingleOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QueryFirstOrDefaultAsync
+    public Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryFirstOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public object ExecuteScalar(string sql, object? param = null, IDbTransaction? transaction = null,
-                                int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.ExecuteScalar(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
 
-    public Task<object> ExecuteScalarAsync(string sql, object? param = null, IDbTransaction? transaction = null,
-                                           int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.ExecuteScalarAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QuerySingle
+    public T QuerySingle<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.QuerySingle<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public SqlMapper.GridReader QueryMultiple(string sql, object? param = null, IDbTransaction? transaction = null,
-                                              int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLogging(() => _inner.QueryMultiple(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
 
-    public Task<SqlMapper.GridReader> QueryMultipleAsync(string sql, object? param = null, IDbTransaction? transaction = null,
-                                                         int? commandTimeout = null, CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() => _inner.QueryMultipleAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
-    }
+    #region QuerySingleAsync
+    public Task<T> QuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QuerySingleAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TThird, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
+    #region QuerySingleOrDefault
+    public T? QuerySingleOrDefault<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.QuerySingleOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TThird, TFourth, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
+    #region QuerySingleOrDefaultAsync
+    public Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QuerySingleOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
+    #endregion
 
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(
-        string sql,
-        Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map,
-        object? param = null,
-        IDbTransaction? transaction = null,
-        bool buffered = true,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null)
-    {
-        return ExecuteWithLoggingAsync(() =>
-            _inner.QueryAsync(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType),
-            sql, param);
-    }
+    #region ExecuteScalar
+    public object? ExecuteScalar(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.ExecuteScalar(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
+
+
+    #region ExecuteScalarAsync
+    public Task<object?> ExecuteScalarAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.ExecuteScalarAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
+
+
+    #region QueryMultiple
+    public SqlMapper.GridReader QueryMultiple(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.QueryMultiple(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
+
+    #region QueryMultipleAsync
+    public Task<SqlMapper.GridReader> QueryMultipleAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLoggingAsync(() => _inner.QueryMultipleAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
+    #endregion
+
+
+
+
+
+
     #endregion
 
     private T ExecuteWithLogging<T>(Func<T> func, string sql, object? param)
