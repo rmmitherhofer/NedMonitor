@@ -7,6 +7,7 @@ using NedMonitor.Core.Interfaces;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
 using NedMonitor.Dapper.Cache;
+using NedMonitor.Dapper.Extensions;
 using System.Data;
 using System.Diagnostics;
 using Zypher.Json;
@@ -67,10 +68,30 @@ public class CountingDbConnection : IDbConnection
         => ExecuteWithLoggingAsync(() => _inner.ExecuteAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
 
-
     #region Query
     public IEnumerable<T> Query<T>(string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLogging(() => _inner.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType), sql, param);
+    public IEnumerable<dynamic> Query(string sql, object? param = null, IDbTransaction? trans = null, bool buffered = true, int? timeout = null, CommandType? type = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, param, trans, buffered, timeout, type), sql, param);
+    public IEnumerable<object> Query(Type type, string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(type, sql, param, transaction, buffered, commandTimeout, commandType), sql, param);
+    public IEnumerable<T> Query<T>(CommandDefinition command)
+        => ExecuteWithLogging(() => _inner.Query<T>(command), command.CommandText, command.Parameters);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TReturn>(string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+    public IEnumerable<TReturn> Query<TReturn>(string sql, Type[] types, Func<object[], TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => ExecuteWithLogging(() => _inner.Query<TReturn>(sql, types, map, param, transaction, buffered, splitOn, commandTimeout, commandType), sql, param);
+
     #endregion
 
     #region QueryAsync
@@ -106,30 +127,25 @@ public class CountingDbConnection : IDbConnection
         => ExecuteWithLogging(() => _inner.QueryFirstOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
 
-
     #region QueryFirstOrDefaultAsync
     public Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLoggingAsync(() => _inner.QueryFirstOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
-
 
     #region QuerySingle
     public T QuerySingle<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLogging(() => _inner.QuerySingle<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
 
-
     #region QuerySingleAsync
     public Task<T> QuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLoggingAsync(() => _inner.QuerySingleAsync<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
 
-
     #region QuerySingleOrDefault
     public T? QuerySingleOrDefault<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLogging(() => _inner.QuerySingleOrDefault<T>(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
-
 
     #region QuerySingleOrDefaultAsync
     public Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
@@ -142,12 +158,10 @@ public class CountingDbConnection : IDbConnection
         => ExecuteWithLogging(() => _inner.ExecuteScalar(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
 
-
     #region ExecuteScalarAsync
     public Task<object?> ExecuteScalarAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => ExecuteWithLoggingAsync(() => _inner.ExecuteScalarAsync(sql, param, transaction, commandTimeout, commandType), sql, param);
     #endregion
-
 
     #region QueryMultiple
     public SqlMapper.GridReader QueryMultiple(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
@@ -212,7 +226,6 @@ public class CountingDbConnection : IDbConnection
 
     private void LogQuery(string sql, object param, long durationMs, bool success, string exceptionMessage)
     {
-
         if (!_settings.Enabled.GetValueOrDefault()) return;
         if (_settings.CaptureOptions?.Any() != true || _settings.CaptureOptions.Contains(CaptureOptions.None)) return;
 
@@ -235,7 +248,7 @@ public class CountingDbConnection : IDbConnection
             entry.Sql = sql;
 
         if (capture.Contains(CaptureOptions.Parameters))
-            entry.Parameters = param == null ? string.Empty : JsonExtensions.Serialize(param);
+            entry.Parameters = param is null ? string.Empty : JsonExtensions.Serialize(DynamicParametersExtensions.GetDeclaredParameters(param));
 
         if (capture.Contains(CaptureOptions.ExceptionMessage))
             entry.ExceptionMessage = exceptionMessage;
@@ -246,3 +259,4 @@ public class CountingDbConnection : IDbConnection
         QueryLogHelper.AddQueryLog(context, entry);
     }
 }
+

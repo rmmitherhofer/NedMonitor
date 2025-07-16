@@ -1,9 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using NedMonitor.Dapper.Interceptors;
-using Solucao.RH.Customers.Data.TesteDapper;
 using System.Data;
-using System.Data.Common;
 using Zypher.Logs.Extensions;
 
 namespace NedMonitor.Dapper.Wrappers;
@@ -27,26 +25,33 @@ internal class NedDapperWrapper : INedDapperWrapper
     #endregion
 
     #region ExecuteReaderAsync
+    public Task<IDataReader> ExecuteReaderAsync(IDbConnection conn, CommandDefinition command)
+        => UseConnAsync(conn, c => c.ExecuteReaderAsync(command), () => conn.ExecuteReaderAsync(command));
+    public Task<IDataReader> ExecuteReaderAsync(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => UseConnAsync(cnn, c => c.ExecuteReaderAsync(sql, param, transaction, commandTimeout, commandType), () => cnn.ExecuteReaderAsync(sql, param, transaction, commandTimeout, commandType));
+    public Task<IDataReader> ExecuteReaderAsync(IDbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
+        => UseConnAsync(cnn, c => c.ExecuteReaderAsync(command, commandBehavior), () => cnn.ExecuteReaderAsync(command, commandBehavior));
+    #endregion
 
-    public IDataReader ExecuteReader(IDbConnection conn, CommandDefinition command) =>
-        UseConn(conn, c => c.ExecuteReader(command), () => conn.ExecuteReader(command));
-
-    public Task<IDataReader> ExecuteReaderAsync(IDbConnection conn, CommandDefinition command) =>
-        UseConnAsync(conn, c => c.ExecuteReaderAsync(command), () => conn.ExecuteReaderAsync(command));
-
-
+    #region MyRegion
+    public IDataReader ExecuteReader(IDbConnection conn, CommandDefinition command)
+        => UseConn(conn, c => c.ExecuteReader(command), () => conn.ExecuteReader(command));
+    public IDataReader ExecuteReader(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+       => UseConn(cnn, c => c.ExecuteReader(sql, param, transaction, commandTimeout, commandType), () => cnn.ExecuteReader(sql, param, transaction, commandTimeout, commandType));
+    public IDataReader ExecuteReader(IDbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
+        => UseConn(cnn, c => c.ExecuteReader(command, commandBehavior), () => cnn.ExecuteReader(command, commandBehavior));
     #endregion
 
     #region ExecuteScalarAsync
 
-    public Task<object?> ExecuteScalarAsync(IDbConnection conn, CommandDefinition command) =>
-        UseConnAsync(conn, c => c.ExecuteScalarAsync(command), () => conn.ExecuteScalarAsync(command));
-
-    public Task<T?> ExecuteScalarAsync<T>(IDbConnection conn, CommandDefinition command) =>
-        UseConnAsync(conn, c => c.ExecuteScalarAsync<T>(command), () => conn.ExecuteScalarAsync<T>(command));
-
+    public Task<object?> ExecuteScalarAsync(IDbConnection conn, CommandDefinition command)
+        => UseConnAsync(conn, c => c.ExecuteScalarAsync(command), () => conn.ExecuteScalarAsync(command));
+    public Task<T?> ExecuteScalarAsync<T>(IDbConnection conn, CommandDefinition command)
+        => UseConnAsync(conn, c => c.ExecuteScalarAsync<T>(command), () => conn.ExecuteScalarAsync<T>(command));
     public Task<object?> ExecuteScalarAsync(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => UseConnAsync(cnn, c => c.ExecuteScalarAsync(sql, param, transaction, commandTimeout, commandType), () => cnn.ExecuteScalarAsync(sql, param, transaction, commandTimeout, commandType));
+    public Task<T?> ExecuteScalarAsync<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => UseConnAsync(cnn, c => c.ExecuteScalarAsync<T>(sql, param, transaction, commandTimeout, commandType), () => cnn.ExecuteScalarAsync<T>(sql, param, transaction, commandTimeout, commandType));
 
     #endregion
 
@@ -56,10 +61,8 @@ internal class NedDapperWrapper : INedDapperWrapper
 
     public T? ExecuteScalar<T>(IDbConnection conn, string sql, object? param = null, IDbTransaction? trans = null, int? timeout = null, CommandType? type = null)
         => UseConn(conn, c => c.ExecuteScalar<T>(sql, param, trans, timeout, type), () => conn.ExecuteScalar<T>(sql, param, trans, timeout, type));
-
     public object? ExecuteScalar(IDbConnection conn, CommandDefinition command)
         => UseConn(conn, c => c.ExecuteScalar(command), () => conn.ExecuteScalar(command));
-
     public T? ExecuteScalar<T>(IDbConnection conn, CommandDefinition command)
         => UseConn(conn, c => c.ExecuteScalar<T>(command), () => conn.ExecuteScalar<T>(command));
 
@@ -126,9 +129,8 @@ internal class NedDapperWrapper : INedDapperWrapper
         => UseConnAsync(conn, c => c.QuerySingleOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType), () => conn.QuerySingleOrDefaultAsync<T>(sql, param, transaction, commandTimeout, commandType));
     public Task<dynamic?> QuerySingleOrDefaultAsync(IDbConnection conn, CommandDefinition command)
         => UseConnAsync(conn, c => c.QuerySingleOrDefaultAsync(command), () => conn.QuerySingleOrDefaultAsync(command));
-
     public Task<object?> QuerySingleOrDefaultAsync(IDbConnection cnn, Type type, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    => UseConnAsync(cnn, c => c.QuerySingleOrDefaultAsync(type, sql, param, transaction, commandTimeout, commandType), () => cnn.QuerySingleOrDefaultAsync(type, sql, param, transaction, commandTimeout, commandType));
+        => UseConnAsync(cnn, c => c.QuerySingleOrDefaultAsync(type, sql, param, transaction, commandTimeout, commandType), () => cnn.QuerySingleOrDefaultAsync(type, sql, param, transaction, commandTimeout, commandType));
     public Task<object?> QuerySingleOrDefaultAsync(IDbConnection cnn, Type type, CommandDefinition command)
         => UseConnAsync(cnn, c => c.QuerySingleOrDefaultAsync(type, command), () => cnn.QuerySingleOrDefaultAsync(type, command));
 
@@ -174,36 +176,16 @@ internal class NedDapperWrapper : INedDapperWrapper
     #endregion
 
     #region QueryAsync
-
-    public IEnumerable<dynamic> Query(IDbConnection conn, string sql, object? param = null, IDbTransaction? trans = null, bool buffered = true, int? timeout = null, CommandType? type = null) =>
-        UseConn(conn, c => c.Query(sql, param, trans, buffered, timeout, type), () => conn.Query(sql, param, trans, buffered, timeout, type));
-
-    public IEnumerable<T> Query<T>(IDbConnection conn, string sql, object? param = null, IDbTransaction? trans = null, bool buffered = true, int? timeout = null, CommandType? type = null) =>
-        UseConn(conn, c => c.Query<T>(sql, param, trans, buffered, timeout, type), () => conn.Query<T>(sql, param, trans, buffered, timeout, type));
-
     public Task<IEnumerable<T>> QueryAsync<T>(IDbConnection conn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         => UseConnAsync(conn, c => c.QueryAsync<T>(sql, param, transaction, commandTimeout, commandType), () => conn.QueryAsync<T>(sql, param, transaction, commandTimeout, commandType));
-
-
-    public Task<IEnumerable<dynamic>> QueryAsync(IDbConnection conn, string sql, object? param = null,
-        IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        ArgumentNullException.ThrowIfNull(conn, nameof(IDbConnection));
-
-        if (conn is CountingDbConnection countingDbConnection)
-            return countingDbConnection.QueryAsync(sql, param, transaction, commandTimeout, commandType);
-
-        LogUnmonitored();
-        return conn.QueryAsync(sql, param, transaction, commandTimeout, commandType);
-    }
-
-
-    public Task<IEnumerable<dynamic>> QueryAsync(IDbConnection conn, CommandDefinition command) =>
-        UseConnAsync(conn, c => c.QueryAsync(command), () => conn.QueryAsync(command));
-
+    public Task<IEnumerable<object>> QueryAsync(IDbConnection cnn, Type type, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => UseConnAsync(cnn, c => c.QueryAsync(type, sql, param, transaction, commandTimeout, commandType), () => cnn.QueryAsync(type, sql, param, transaction, commandTimeout, commandType));
+    public Task<IEnumerable<dynamic>> QueryAsync(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        => UseConnAsync(cnn, c => c.QueryAsync(sql, param, transaction, commandTimeout, commandType), () => cnn.QueryAsync(sql, param, transaction, commandTimeout, commandType));
+    public Task<IEnumerable<dynamic>> QueryAsync(IDbConnection conn, CommandDefinition command)
+        => UseConnAsync(conn, c => c.QueryAsync(command), () => conn.QueryAsync(command));
     public Task<IEnumerable<T>> QueryAsync<T>(IDbConnection cnn, CommandDefinition command)
         => UseConnAsync(cnn, c => c.QueryAsync<T>(command), () => cnn.QueryAsync<T>(command));
-
     public Task<IEnumerable<object>> QueryAsync(IDbConnection cnn, Type type, CommandDefinition command)
         => UseConnAsync(cnn, c => c.QueryAsync(type, command), () => cnn.QueryAsync(type, command));
     public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
@@ -222,10 +204,30 @@ internal class NedDapperWrapper : INedDapperWrapper
     #endregion
 
     #region Query
+
+    public IEnumerable<dynamic> Query(IDbConnection conn, string sql, object? param = null, IDbTransaction? trans = null, bool buffered = true, int? timeout = null, CommandType? type = null)
+        => UseConn(conn, c => c.Query(sql, param, trans, buffered, timeout, type), () => conn.Query(sql, param, trans, buffered, timeout, type));
+    public IEnumerable<T> Query<T>(IDbConnection conn, string sql, object? param = null, IDbTransaction? trans = null, bool buffered = true, int? timeout = null, CommandType? type = null)
+        => UseConn(conn, c => c.Query<T>(sql, param, trans, buffered, timeout, type), () => conn.Query<T>(sql, param, trans, buffered, timeout, type));
     public IEnumerable<object> Query(IDbConnection cnn, Type type, string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         => UseConn(cnn, c => c.Query(type, sql, param, transaction, buffered, commandTimeout, commandType), () => cnn.Query(type, sql, param, transaction, buffered, commandTimeout, commandType));
     public IEnumerable<T> Query<T>(IDbConnection cnn, CommandDefinition command)
         => UseConn(cnn, c => c.Query<T>(command), () => cnn.Query<T>(command));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+    public IEnumerable<TReturn> Query<TReturn>(IDbConnection cnn, string sql, Type[] types, Func<object[], TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
+        => UseConn(cnn, c => c.Query(sql, types, map, param, transaction, buffered, splitOn, commandTimeout, commandType), () => cnn.Query(sql, types, map, param, transaction, buffered, splitOn, commandTimeout, commandType));
+
     #endregion
 
     #region QueryMultipleAsync
@@ -245,10 +247,8 @@ internal class NedDapperWrapper : INedDapperWrapper
         => UseConn(cnn, c => c.QueryMultiple(command), () => cnn.QueryMultiple(command));
     #endregion
 
-
     #region private
-    private void LogUnmonitored() =>
-_logger.LogWarn("Query not monitored by NedMonitor (connection is not CountingDbConnection)");
+    private void LogUnmonitored() => _logger.LogWarn("Query not monitored by NedMonitor (connection is not CountingDbConnection)");
 
     private T UseConn<T>(IDbConnection conn, Func<CountingDbConnection, T> useCounting, Func<T> useDapper)
     {
@@ -275,160 +275,4 @@ _logger.LogWarn("Query not monitored by NedMonitor (connection is not CountingDb
     }
 
     #endregion
-
-
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TThird, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(IDbConnection cnn, CommandDefinition command, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, string splitOn = "Id")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TReturn>> QueryAsync<TReturn>(IDbConnection cnn, string sql, Type[] types, Func<object[], TReturn> map, object? param = null, IDbTransaction? transaction = null, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<TReturn> Query<TReturn>(IDbConnection cnn, string sql, Type[] types, Func<object[], TReturn> map, object? param = null, IDbTransaction? transaction = null, bool buffered = true, string? splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IDataReader> ExecuteReaderAsync(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<DbDataReader> ExecuteReaderAsync(DbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<DbDataReader> ExecuteReaderAsync(DbConnection cnn, CommandDefinition command)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IDataReader> ExecuteReaderAsync(IDbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<DbDataReader> ExecuteReaderAsync(DbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IDataReader ExecuteReader(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IDataReader ExecuteReader(IDbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
-    {
-        throw new NotImplementedException();
-    }
-    public Task<T?> ExecuteScalarAsync<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IAsyncEnumerable<dynamic> QueryUnbufferedAsync(DbConnection cnn, string sql, object? param = null, DbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IAsyncEnumerable<T> QueryUnbufferedAsync<T>(DbConnection cnn, string sql, object? param = null, DbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<object>> QueryAsync(IDbConnection cnn, Type type, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-    {
-        throw new NotImplementedException();
-    }
 }

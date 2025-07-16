@@ -5,7 +5,6 @@ using NedMonitor.Core.Helpers;
 using NedMonitor.Core.Interfaces;
 using NedMonitor.Dapper.Wrappers;
 using NedMonitor.DataInterceptors.Middleware;
-using Solucao.RH.Customers.Data.TesteDapper;
 using Zypher.Extensions.Core;
 
 namespace NedMonitor.Dapper.Configurations;
