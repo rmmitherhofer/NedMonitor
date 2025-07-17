@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using NedMonitor.Applications;
 using NedMonitor.Core;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
@@ -12,10 +11,7 @@ public class NedMonitorExceptionCaptureMiddleware
     private readonly RequestDelegate _next;
     private readonly NedMonitorSettings _settings;
 
-    public NedMonitorExceptionCaptureMiddleware(
-        RequestDelegate next,
-        INedMonitorApplication nedMonitor,
-        IOptions<NedMonitorSettings> settings)
+    public NedMonitorExceptionCaptureMiddleware(RequestDelegate next, IOptions<NedMonitorSettings> settings)
     {
         _next = next;
         _settings = settings.Value;

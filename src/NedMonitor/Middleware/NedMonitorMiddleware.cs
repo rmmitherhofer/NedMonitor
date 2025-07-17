@@ -17,19 +17,15 @@ public class NedMonitorMiddleware
     public const string Name = nameof(NedMonitorMiddleware);
 
     private readonly RequestDelegate _next;
-    private readonly INedMonitorQueue _queue;
     private Stopwatch _diagnostic;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NedMonitorMiddleware"/> class.
     /// </summary>
     /// <param name="next">The next middleware in the pipeline.</param>
-    public NedMonitorMiddleware(RequestDelegate next, INedMonitorQueue queue)
+    public NedMonitorMiddleware(RequestDelegate next)
     {
-        ArgumentNullException.ThrowIfNull(queue, nameof(INedMonitorQueue));
-
         _next = next;
-        _queue = queue;
     }
 
     /// <summary>
@@ -37,16 +33,25 @@ public class NedMonitorMiddleware
     /// In case of an exception, the exception is stored in the HTTP context for later processing.
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, INedMonitorQueue queue)
     {
         DateTime startAt = DateTime.UtcNow;
-        _diagnostic = new();
-        _diagnostic.Start();
+        try
+        {
+            _diagnostic = new();
+            _diagnostic.Start();
 
-        await _next(context);
+            await _next(context);
 
-        _diagnostic.Stop();
-
-        _queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.UtcNow));
+            _diagnostic.Stop();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+        finally
+        {
+            queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.UtcNow));
+        }
     }
 }

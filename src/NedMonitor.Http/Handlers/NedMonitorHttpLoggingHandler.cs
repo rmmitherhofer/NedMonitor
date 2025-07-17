@@ -78,7 +78,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
 
             if (response.Content is not null)
             {
-                var rawBody = await request.Content.ReadAsStringAsync();
+                var rawBody = await response.Content.ReadAsStringAsync();
                 long maxSize = _settings.HttpLogging.MaxResponseBodySizeInMb * 1024L * 1024L;
 
                 if (rawBody.Length <= maxSize)
