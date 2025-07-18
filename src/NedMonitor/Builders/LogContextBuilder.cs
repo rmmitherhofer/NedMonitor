@@ -156,12 +156,14 @@ public class LogContextBuilder : ILogContextBuilder
             MaxResponseBodySizeInMb = _settings.HttpLogging.MaxResponseBodySizeInMb,
             CaptureResponseBody = _settings.HttpLogging.CaptureResponseBody,
             WritePayloadToConsole = _settings.HttpLogging.WritePayloadToConsole,
+            CaptureCookies = _settings.HttpLogging.CaptureCookies,
         },
         SensitiveDataMasking = new()
         {
             Enabled = _settings.SensitiveDataMasking?.Enabled ?? false,
             SensitiveKeys = _settings.SensitiveDataMasking?.SensitiveKeys,
             MaskValue = _settings.SensitiveDataMasking?.MaskValue,
+            SensitivePatterns = _settings.SensitiveDataMasking?.SensitivePatterns
         },
         Exceptions = new()
         {

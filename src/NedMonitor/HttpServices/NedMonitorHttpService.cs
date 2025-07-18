@@ -120,10 +120,10 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
             {
                 case IssuerResponseType.NotFound:
                 case IssuerResponseType.Validation:
-                    _logger.LogWarn(sb.ToString());
+                    _logger.LogWarning(sb.ToString());
                     break;
                 case IssuerResponseType.Error:
-                    _logger.LogFail(sb.ToString());
+                    _logger.LogError(sb.ToString());
                     break;
             }
         }
