@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
-using NedMonitor.Extensions;
 using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
@@ -111,9 +110,13 @@ public class LogContextBuilder : ILogContextBuilder
             StartTimeUtc = _snapshot.StartTimeUtc,
             EndTimeUtc = _snapshot.EndTimeUtc,
             CorrelationId = _snapshot.CorrelationId,
-            Path = _snapshot.Path,
+            Uri = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.Path}",
+            UriTemplate = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.PathTemplate}",
             TotalMilliseconds = _snapshot.TotalMilliseconds,
             TraceIdentifier = _snapshot.TraceId,
+            RemotePort = _snapshot.RemotePort,
+            LocalPort = _snapshot.LocalPort,
+            LocalIpAddress = _snapshot.LocalIpAddress,
             Project = AddProject(),
             Environment = AddEnvironment(),
             User = AddUserContext(),
@@ -139,10 +142,11 @@ public class LogContextBuilder : ILogContextBuilder
         Id = _settings.ProjectId,
         Name = _settings.Name,
         Type = _settings.ProjectType,
-        ExecutionMode = new() {
+        ExecutionMode = new()
+        {
             EnableNedMonitor = _settings.ExecutionMode.EnableNedMonitor,
             EnableMonitorExceptions = _settings.ExecutionMode.EnableMonitorExceptions,
-            EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,           
+            EnableMonitorHttpRequests = _settings.ExecutionMode.EnableMonitorHttpRequests,
             EnableMonitorLogs = _settings.ExecutionMode.EnableMonitorLogs,
             EnableMonitorNotifications = _settings.ExecutionMode.EnableMonitorNotifications,
             EnableMonitorDbQueries = _settings.ExecutionMode.EnableMonitorDbQueries,
@@ -205,6 +209,7 @@ public class LogContextBuilder : ILogContextBuilder
             Name = _snapshot.UserName,
             Document = _snapshot.UserDocument,
             Account = _snapshot.UserAccount,
+            AccountCode = _snapshot.UserAccountCode,
             Email = _snapshot.UserEmail,
             TenantId = _snapshot.TenantId,
             IsAuthenticated = _snapshot.IsAuthenticated,
@@ -227,15 +232,22 @@ public class LogContextBuilder : ILogContextBuilder
         {
             Id = _snapshot.RequestId,
             HttpMethod = _snapshot.Method,
-            Url = _snapshot.Url,
+            Host = _snapshot.Host,
+            PathBase = _snapshot.PathBase,
+            Path = _snapshot.Path,
+            PathTemplate = _snapshot.PathTemplate,
+            FullPath = _snapshot.FullPath,
+            Referer = _snapshot.Referer,
             Scheme = _snapshot.Scheme,
             Protocol = _snapshot.Protocol,
             IsHttps = _snapshot.IsHttps,
+            HasFormContentType = _snapshot.HasFormContentType,
             QueryString = _snapshot.QueryString,
             RouteValues = _snapshot.RouteValues,
             UserAgent = _snapshot.UserAgent,
             ClientId = _snapshot.ClientId,
-            Headers = _snapshot.RequestHeaders,
+            Headers = _sensitiveDataMasker.Mask(_snapshot.RequestHeaders),
+            Cookies = _settings.HttpLogging.CaptureCookies ? _sensitiveDataMasker.Mask(_snapshot.RequestCookies) : null,
             ContentType = _snapshot.RequestContentType,
             ContentLength = _snapshot.RequestContentLength,
             Body = requestBodyObj,
@@ -386,8 +398,8 @@ public class LogContextBuilder : ILogContextBuilder
             StatusCode = (HttpStatusCode)n.StatusCode,
             RequestBody = GetObjectBody(n.RequestBody),
             ResponseBody = GetObjectBody(n.ResponseBody),
-            RequestHeaders = n.RequestHeaders,
-            ResponseHeaders = n.ResponseHeaders,
+            RequestHeaders = _sensitiveDataMasker.Mask(n.RequestHeaders),
+            ResponseHeaders = _sensitiveDataMasker.Mask(n.ResponseHeaders),
             ExceptionType = n.ExceptionType,
             ExceptionMessage = n.ExceptionMessage,
             StackTrace = n.StackTrace
@@ -401,10 +413,10 @@ public class LogContextBuilder : ILogContextBuilder
 
         return _snapshot.Dependencies.Select(n => new DependencyInfoHttpRequest
         {
-           Type = n.Type,
-           Target = n.Target,
-           Success = n.Success,
-           DurationMs = n.DurationMs
+            Type = n.Type,
+            Target = n.Target,
+            Success = n.Success,
+            DurationMs = n.DurationMs
         });
     }
     /// <summary>

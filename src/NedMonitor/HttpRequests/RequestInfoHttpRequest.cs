@@ -22,8 +22,8 @@ public class RequestInfoHttpRequest
     /// <summary>
     /// The full URL of the request.
     /// </summary>
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
+    [JsonPropertyName("fullPath")]
+    public string FullPath { get; set; }
 
     /// <summary>
     /// The URL scheme (http, https).
@@ -107,4 +107,48 @@ public class RequestInfoHttpRequest
     /// </summary>
     [JsonPropertyName("ipAddress")]
     public string? IpAddress { get; set; }
+    /// <summary>
+    /// Hostname of the incoming HTTP request (e.g., "example.com").
+    /// </summary>
+    [JsonPropertyName("host")]
+    public string Host { get; set; }
+
+    /// <summary>
+    /// The base path of the request URL, if the application is hosted in a sub-directory.
+    /// </summary>
+    [JsonPropertyName("pathBase")]
+    public string PathBase { get; set; }
+
+    /// <summary>
+    /// The relative path of the request URL (excluding the base path and query string).
+    /// </summary>
+    [JsonPropertyName("path")]
+    public string Path { get; set; }
+
+    /// <summary>
+    /// Gets or sets the matched route pattern (path template) for the request, such as "/api/orders/{orderId}".
+    /// Represents the logical routing path without actual parameter values.
+    /// </summary>
+    [JsonPropertyName("pathTemplate")]
+    public string? PathTemplate { get; set; }
+
+    /// <summary>
+    /// The value of the Referer header, indicating the URL of the previous web page from which the request originated.
+    /// </summary>
+    [JsonPropertyName("referer")]
+    public string? Referer { get; set; }
+
+    /// <summary>
+    /// Dictionary containing the cookies sent with the request, where the key is the cookie name and the value is the cookie value.
+    /// </summary>
+    [JsonPropertyName("cookies")]
+    public IDictionary<string, string>? Cookies { get; set; }
+
+
+    /// <summary>
+    /// Indicates whether the request has a form content type (e.g., multipart/form-data).
+    /// </summary>
+    [JsonPropertyName("hasFormContentType")]
+    public bool HasFormContentType { get; set; }
+
 }

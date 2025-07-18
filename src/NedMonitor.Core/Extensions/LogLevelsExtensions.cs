@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace NedMonitor.Extensions;
+namespace NedMonitor.Core.Extensions;
 
 /// <summary>
 /// Extension methods to enrich <see cref="LogEntry"/> objects with caller member information.
@@ -48,7 +48,7 @@ internal static class LogLevelsExtensions
             }
         }
 
-        foreach (var frame in stackTrace.GetFrames() ?? Array.Empty<StackFrame>())
+        foreach (var frame in stackTrace.GetFrames() ?? [])
         {
             var method = frame.GetMethod();
             if (method?.DeclaringType?.Namespace != null &&
@@ -67,8 +67,9 @@ internal static class LogLevelsExtensions
         }
         else
         {
+            var firstFrame = stackTrace.GetFrame(0);
             entry.MemberName = memberName;
-            entry.MemberType = memberType;
+            entry.MemberType = firstFrame?.GetMethod()?.DeclaringType?.FullName ?? "Unknown";
             entry.LineNumber = lineNumber;
         }
 

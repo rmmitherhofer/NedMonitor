@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using NedMonitor.Core.Adapters;
 using System.Diagnostics;
 using Zypher.Extensions.Core;
@@ -30,6 +31,14 @@ public class Snapshot
     /// Indicates if the request uses HTTPS.
     /// </summary>
     public bool IsHttps { get; set; }
+    /// <summary>
+    /// The raw path of the request.
+    /// </summary>
+    public string PathBase { get; set; }
+    public string Path { get; set; }
+    public string FullPath { get; set; }
+    public string? PathTemplate { get; set; }
+    public string? Referer { get; set; }
 
     /// <summary>
     /// The query string parameters.
@@ -55,6 +64,11 @@ public class Snapshot
     /// The HTTP headers included in the request.
     /// </summary>
     public IDictionary<string, List<string>> RequestHeaders { get; set; }
+
+    public IDictionary<string, string>? RequestCookies { get; set; }
+
+    public string Host { get; set; }
+
 
     /// <summary>
     /// The content type of the request body.
@@ -183,6 +197,7 @@ public class Snapshot
     public IEnumerable<DependencyInfo>? Dependencies { get; set; }
     #endregion
 
+    #region Log
     /// <summary>
     /// Gets or sets the UTC timestamp indicating when the operation started.
     /// </summary>
@@ -201,22 +216,19 @@ public class Snapshot
     /// Trace ID for request correlation (used by ASP.NET Core diagnostics).
     /// </summary>
     public string? TraceId { get; set; }
-    /// <summary>
-    /// The raw path of the request.
-    /// </summary>
-    public string Path { get; set; }
+
     /// <summary>
     /// The HTTP method used (duplicate of HttpMethod).
     /// </summary>
     public string Method { get; set; }
     /// <summary>
-    /// The full request URL (duplicate of RequestUrl).
-    /// </summary>
-    public string Url { get; set; }
-    /// <summary>
     /// The total duration of the request in milliseconds.
     /// </summary>
     public double TotalMilliseconds { get; set; }
+    public int RemotePort { get; set; }
+    public int LocalPort { get; set; }
+    public string LocalIpAddress { get; set; }
+
     /// <summary>
     /// List of log entries captured during the request.
     /// </summary>
@@ -233,6 +245,7 @@ public class Snapshot
     public ExceptionInfo? Exception { get; set; }
 
     public List<HttpRequestLogContext>? HttpClientLogs { get; set; }
+    #endregion
 
     /// <summary>
     /// Captures the full snapshot of the HTTP request lifecycle, including request, response, user information,
@@ -258,19 +271,25 @@ public class Snapshot
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_COUNT_KEY, out var queryCountObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY, out var queryLogsObj);
 
+        var endpoint = context.GetEndpoint();
+
+        var test = request.IsAjaxRequest();
+
         return new Snapshot
         {
             StartTimeUtc = startTimeAt,
             EndTimeUtc = endTimeAt,
             CorrelationId = request.GetCorrelationId(),
             TraceId = context.TraceIdentifier,
-            Path = request.Path,
             TotalMilliseconds = elapsedMs,
+            RemotePort = context.Connection.RemotePort,
+            LocalPort = context.Connection.LocalPort,
+            LocalIpAddress = context.Connection.LocalIpAddress?.ToString(),
 
             #region Request
             RequestId = request.GetRequestId(),
             Method = request.Method,
-            Url = request.GetFullUrl(),
+            PathTemplate = (endpoint as RouteEndpoint)?.RoutePattern?.RawText,
             Scheme = request.Scheme,
             Protocol = request.Protocol,
             IsHttps = request.IsHttps,
@@ -284,6 +303,12 @@ public class Snapshot
             RequestBody = GetRequestBodyAsync(context),
             IsAjaxRequest = request.IsAjaxRequest(),
             IpAddress = request.GetIpAddress(),
+            RequestCookies = request.Cookies.ToDictionary(c => c.Key, v => v.Value?.ToString()),
+            Host = request.Host.ToString(),
+            Path = request.Path,
+            PathBase = request.PathBase.ToString(),            
+            FullPath = request.GetFullUrl(),
+            Referer = request.Headers["Referer"].ToString(),
             #endregion
 
             #region Response

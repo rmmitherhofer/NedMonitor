@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Zypher.Json;
 
-namespace NedMonitor.Extensions;
+namespace NedMonitor.Core.Extensions;
 
 /// <summary>
 /// Masks sensitive data fields in objects by replacing values of specified keys with "***REDACTED***".
@@ -49,6 +49,45 @@ public class SensitiveDataMasker
     }
 
     /// <summary>
+    /// Masks sensitive data in a dictionary of string keys and string values.
+    /// </summary>
+    public IDictionary<string, string> Mask(IDictionary<string, string> data)
+    {
+        if (!_enabled || data is null) return data;
+
+        var masked = new Dictionary<string, string>();
+        foreach (var kvp in data)
+        {
+            masked[kvp.Key] = _sensitiveKeys.Contains(kvp.Key) ? _maskValue : kvp.Value;
+        }
+
+        return masked;
+    }
+
+    /// <summary>
+    /// Masks sensitive data in a dictionary of string keys and list of string values.
+    /// </summary>
+    public IDictionary<string, List<string>> Mask(IDictionary<string, List<string>> data)
+    {
+        if (!_enabled || data is null) return data;
+
+        var masked = new Dictionary<string, List<string>>();
+        foreach (var kvp in data)
+        {
+            if (_sensitiveKeys.Contains(kvp.Key))
+            {
+                masked[kvp.Key] = [_maskValue];
+            }
+            else
+            {
+                masked[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return masked;
+    }
+
+    /// <summary>
     /// Recursively processes a JSON element, masking sensitive keys.
     /// </summary>
     /// <param name="element">The JSON element to mask.</param>
@@ -90,4 +129,5 @@ public class SensitiveDataMasker
             default: return null;
         }
     }
+
 }

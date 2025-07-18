@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.Dapper</PackageId>
-		<Version>1.2.0-dev</Version>
+		<Version>1.2.2-dev</Version>
 		<Authors>Renato Mitherhofer</Authors>
 		
 		<Title>NedMonitor Dapper Interceptors</Title>
@@ -26,6 +26,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 
+		<PackageIcon>assets/icon.png</PackageIcon>
+		<IncludePackageIcon>true</IncludePackageIcon>
+		
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
@@ -37,6 +40,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
-		<PackageReference Include="NedMonitor.Core" Version="1.0.1" />
+		<PackageReference Include="NedMonitor.Core" Version="1.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="assets/icon.png" Pack="true" PackagePath="assets/" />
 	</ItemGroup>
 </Project>

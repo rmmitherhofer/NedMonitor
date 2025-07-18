@@ -11,35 +11,26 @@ namespace NedMonitor.Applications;
 /// Implementation of <see cref="INedMonitorApplication"/> responsible for building and sending log context data
 /// to the NedMonitor API based on runtime snapshot information.
 /// </summary>
-public class NedMonitorApplication : INedMonitorApplication
+/// <remarks>
+/// Initializes a new instance of the <see cref="NedMonitorApplication"/> class.
+/// </remarks>
+/// <param name="httpService">The HTTP service to send log data to NedMonitor.</param>
+/// <param name="options">Configuration options for NedMonitor.</param>
+/// <param name="builder">Builder used to construct the log context.</param>
+public class NedMonitorApplication(
+    INedMonitorHttpService httpService,
+    IOptions<NedMonitorSettings> options,
+    ILogContextBuilder builder) : INedMonitorApplication
 {
-
-    private readonly ILogContextBuilder _builder;
-    private readonly INedMonitorHttpService _httpService;
-    private readonly NedMonitorSettings _settings;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NedMonitorApplication"/> class.
-    /// </summary>
-    /// <param name="httpService">The HTTP service to send log data to NedMonitor.</param>
-    /// <param name="options">Configuration options for NedMonitor.</param>
-    /// <param name="builder">Builder used to construct the log context.</param>
-    public NedMonitorApplication(
-        INedMonitorHttpService httpService,
-        IOptions<NedMonitorSettings> options,
-        ILogContextBuilder builder)
-    {
-        _httpService = httpService;
-        _settings = options.Value;
-        _builder = builder;
-    }
+    private readonly ILogContextBuilder _builder = builder;
+    private readonly INedMonitorHttpService _httpService = httpService;
+    private readonly NedMonitorSettings _settings = options.Value;
 
     /// <summary>
     /// Builds a complete log context from the provided snapshot and sends it to the NedMonitor API,
     /// if logging is enabled via configuration.
     /// </summary>
     /// <param name="snapshot">The snapshot containing request, response, exception, and other contextual data.</param>
-
     public async Task Notify(Snapshot snapshot)
     {
         if (!_settings.ExecutionMode.EnableNedMonitor) return;

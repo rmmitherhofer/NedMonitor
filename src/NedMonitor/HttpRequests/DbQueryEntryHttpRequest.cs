@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace NedMonitor.Core.Models;
+namespace NedMonitor.HttpRequests;
 
 /// <summary>
 /// Represents a single query execution log entry.

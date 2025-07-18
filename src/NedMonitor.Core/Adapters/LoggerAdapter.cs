@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Formatters;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
-using NedMonitor.Extensions;
 
 namespace NedMonitor.Core.Adapters;
 

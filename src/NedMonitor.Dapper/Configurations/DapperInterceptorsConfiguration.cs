@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NedMonitor.Core.Helpers;
 using NedMonitor.Core.Interfaces;
+using NedMonitor.Core.Middlewares;
 using NedMonitor.Dapper.Wrappers;
-using NedMonitor.DataInterceptors.Middleware;
 using Zypher.Extensions.Core;
 
 namespace NedMonitor.Dapper.Configurations;
