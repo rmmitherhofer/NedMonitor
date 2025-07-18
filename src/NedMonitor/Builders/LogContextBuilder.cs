@@ -318,7 +318,7 @@ public class LogContextBuilder : ILogContextBuilder
         {
             Provider = e.Provider,
             Sql = e.Sql,
-            Parameters = e.Parameters,
+            Parameters = _sensitiveDataMasker.MaskString(e.Parameters),
             Success = e.Success,
             DbContext = e.DbContext,
             ExecutedAtUtc = e.ExecutedAtUtc,

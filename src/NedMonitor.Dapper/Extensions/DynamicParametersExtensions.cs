@@ -5,7 +5,7 @@ namespace NedMonitor.Dapper.Extensions;
 
 public static class DynamicParametersExtensions
 {
-    public static Dictionary<string, object?> GetDeclaredParameters(object parametersInstance)
+    public static IDictionary<string, object?> GetDeclaredParameters(object parametersInstance)
     {
         ArgumentNullException.ThrowIfNull(parametersInstance, nameof(parametersInstance));
 

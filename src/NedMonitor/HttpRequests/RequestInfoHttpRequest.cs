@@ -71,7 +71,7 @@ public class RequestInfoHttpRequest
     /// The HTTP headers included in the request.
     /// </summary>
     [JsonPropertyName("headers")]
-    public IDictionary<string, List<string>> Headers { get; set; }
+    public IDictionary<string, List<string>>? Headers { get; set; }
 
     /// <summary>
     /// The content type of the request body.

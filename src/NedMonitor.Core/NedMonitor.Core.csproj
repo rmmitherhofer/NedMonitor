@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.Core</PackageId>
-		<Version>1.1.2</Version>
+		<Version>1.1.3</Version>
 		<Authors>Renato Mitherhofer</Authors>
 
 		<Title>NedMonitor.Core - Centralized Monitoring Library</Title>
@@ -40,7 +40,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Zypher.Http" Version="1.1.1" />
+		<PackageReference Include="Zypher.Http" Version="1.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
