@@ -76,18 +76,18 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
                 .Concat(response.Content?.Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
                 .ToDictionary(h => h.Key, h => h.Value.ToList());
 
-            if (request.Content is not null)
+            if (response.Content is not null)
             {
-                var rawBody = await request.Content.ReadAsStringAsync();
+                var rawBody = await response.Content.ReadAsStringAsync();
                 long maxSize = _settings.HttpLogging.MaxResponseBodySizeInMb * 1024L * 1024L;
 
                 if (rawBody.Length <= maxSize)
                 {
-                    context.RequestBody = rawBody;
+                    context.ResponseBody = rawBody;
                 }
                 else
                 {
-                    context.RequestBody = $"[Body not captured. Size exceeds limit of {_settings.HttpLogging.MaxResponseBodySizeInMb}MB]";
+                    context.ResponseBody = $"[Body not captured. Size exceeds limit of {_settings.HttpLogging.MaxResponseBodySizeInMb}MB]";
                 }
             }
 

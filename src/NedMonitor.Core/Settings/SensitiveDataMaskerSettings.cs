@@ -15,6 +15,7 @@ public class SensitiveDataMaskerSettings
     /// List of keys considered sensitive whose values should be masked.
     /// </summary>
     public List<string> SensitiveKeys { get; set; }
+    public List<string> SensitivePatterns { get; set; }    
 
     /// <summary>
     /// The value that replaces the original sensitive data (e.g., "***REDACTED***").

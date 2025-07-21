@@ -25,4 +25,11 @@ public class HttpLoggingSettingsHttpRequest
     /// </summary>
     [JsonPropertyName("maxResponseBodySizeInMb")]
     public int MaxResponseBodySizeInMb { get; set; } = 1;
+
+    /// <summary>
+    /// Determines whether the cookies from the incoming HTTP request should be captured for monitoring and logging purposes.
+    /// </summary>
+    [JsonPropertyName("captureCookies")]
+
+    public bool CaptureCookies { get; set; }
 }

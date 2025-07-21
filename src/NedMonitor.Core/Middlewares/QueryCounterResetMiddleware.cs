@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Interfaces;
 
-namespace NedMonitor.DataInterceptors.Middleware;
+namespace NedMonitor.Core.Middlewares;
 
 public class QueryCounterResetMiddleware
 {

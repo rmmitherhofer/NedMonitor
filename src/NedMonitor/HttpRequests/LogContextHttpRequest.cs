@@ -1,5 +1,4 @@
 ﻿using NedMonitor.Core.Enums;
-using NedMonitor.Core.Models;
 using System.Text.Json.Serialization;
 
 namespace NedMonitor.HttpRequests;
@@ -36,8 +35,15 @@ public class LogContextHttpRequest
     /// <summary>
     /// The HTTP endpoint path requested.
     /// </summary>
-    [JsonPropertyName("path")]
-    public string Path { get; set; }
+    [JsonPropertyName("uri")]
+    public string Uri { get; set; }
+
+    /// <summary>
+    /// Gets or sets the route template of the HTTP request URI, such as "/api/customers/{id}".
+    /// Useful for identifying the logical endpoint regardless of route parameter values.
+    /// </summary>
+    [JsonPropertyName("uriTemplate")]
+    public string? UriTemplate { get; set; }
 
     /// <summary>
     /// Elapsed time of the request in milliseconds.
@@ -48,13 +54,13 @@ public class LogContextHttpRequest
     /// Unique identifier for the request trace.
     /// </summary>
     [JsonPropertyName("traceIdentifier")]
-    public string TraceIdentifier { get; set; }
+    public string? TraceIdentifier { get; set; }
 
     /// <summary>
     /// Category of the detected error, if applicable.
     /// </summary>
     [JsonPropertyName("errorCategory")]
-    public string ErrorCategory { get; set; }
+    public string? ErrorCategory { get; set; }
 
     /// <summary>
     /// Information about the project generating the log.
@@ -114,8 +120,27 @@ public class LogContextHttpRequest
     /// </summary>
     [JsonPropertyName("httpClientLogs")]
     public IEnumerable<HttpClientLogInfoHttpRequest>? HttpClientLogs { get; set; }
-
-
+    /// <summary>
+    /// Collection of database queries associated with the current HTTP request.
+    /// </summary>
     [JsonPropertyName("dbQueryEntries")]
     public IEnumerable<DbQueryEntryHttpRequest>? DbQueryEntries { get; set; }
+
+    /// <summary>
+    /// Remote port number from which the request originated.
+    /// </summary>
+    [JsonPropertyName("remotePort")]
+    public int RemotePort { get; set; }
+
+    /// <summary>
+    /// Local port number on which the server received the request.
+    /// </summary>
+    [JsonPropertyName("localPort")]
+    public int LocalPort { get; set; }
+
+    /// <summary>
+    /// IP address of the server that handled the request.
+    /// </summary>
+    [JsonPropertyName("localIpAddress")]
+    public string LocalIpAddress { get; set; }
 }

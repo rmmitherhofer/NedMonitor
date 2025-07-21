@@ -54,6 +54,9 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
 
             AddDefaultHeaders(log);
 
+            if (_settings.HttpLogging.WritePayloadToConsole)
+                EnableLogHeadersAndBody();
+
             LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
 
             var response = await _httpClient.PostAsync(uri, content);
@@ -117,10 +120,10 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
             {
                 case IssuerResponseType.NotFound:
                 case IssuerResponseType.Validation:
-                    _logger.LogWarn(sb.ToString());
+                    _logger.LogWarning(sb.ToString());
                     break;
                 case IssuerResponseType.Error:
-                    _logger.LogFail(sb.ToString());
+                    _logger.LogError(sb.ToString());
                     break;
             }
         }
@@ -178,7 +181,10 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
     {
         var clientId = log.Request.ClientId;
 
-        clientId = string.Join(';', clientId, Assembly.GetEntryAssembly().GetName().Name);
+        if (!string.IsNullOrEmpty(clientId))
+            clientId = string.Join(';', clientId, Assembly.GetEntryAssembly().GetName().Name);
+        else
+            clientId = Assembly.GetEntryAssembly().GetName().Name;
 
         if (!string.IsNullOrEmpty(clientId))
             _httpClient.AddHeader(HttpRequestExtensions.CLIENT_ID, clientId);

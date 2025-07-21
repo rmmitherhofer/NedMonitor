@@ -61,13 +61,13 @@ public class HttpClientLogInfoHttpRequest
     /// The headers included in the HTTP request.
     /// </summary>
     [JsonPropertyName("requestHeaders")]
-    public Dictionary<string, List<string>>? RequestHeaders { get; set; }
+    public IDictionary<string, List<string>>? RequestHeaders { get; set; }
 
     /// <summary>
     /// The headers returned in the HTTP response.
     /// </summary>
     [JsonPropertyName("responseHeaders")]
-    public Dictionary<string, List<string>>? ResponseHeaders { get; set; }
+    public IDictionary<string, List<string>>? ResponseHeaders { get; set; }
 
     /// <summary>
     /// The type name of the exception thrown during the request, if any.

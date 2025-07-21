@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NedMonitor.Applications;
 using NedMonitor.Queues;
@@ -9,11 +10,10 @@ namespace NedMonitor.BackgroundServices;
 /// Background service responsible for processing log snapshots from the NedMonitor queue
 /// and sending them asynchronously to the NedMonitor API.
 /// </summary>
-public class NedMonitorBackgroundService(INedMonitorQueue queue, INedMonitorApplication application, ILogger<NedMonitorBackgroundService> logger) : BackgroundService
+public class NedMonitorBackgroundService(IServiceScopeFactory scopeFactory, ILogger<NedMonitorBackgroundService> logger) : BackgroundService
 {
     private readonly ILogger<NedMonitorBackgroundService> _logger = logger;
-    private readonly INedMonitorQueue _queue = queue;
-    private readonly INedMonitorApplication _application = application;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
     /// <summary>
     /// Continuously reads log snapshots from the queue and forwards them to the NedMonitor application
@@ -23,16 +23,27 @@ public class NedMonitorBackgroundService(INedMonitorQueue queue, INedMonitorAppl
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var snapshot in _queue.Reader.ReadAllAsync(stoppingToken))
+
+        while (!stoppingToken.IsCancellationRequested)
         {
-            try
+            using (var scope = _scopeFactory.CreateScope())
             {
-                await _application.Notify(snapshot);
+                var queue = scope.ServiceProvider.GetRequiredService<INedMonitorQueue>();
+                var application = scope.ServiceProvider.GetRequiredService<INedMonitorApplication>();
+
+                await foreach (var snapshot in queue.Reader.ReadAllAsync(stoppingToken))
+                {
+                    try
+                    {
+                        await application.Notify(snapshot);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[{nameof(NedMonitorBackgroundService)}]:{ex.Message} - {ex.StackTrace}");
+                    }
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[{nameof(NedMonitorBackgroundService)}]:{ex.Message} - {ex.StackTrace}");
-            }
+            await Task.Delay(1000, stoppingToken);
         }
     }
 }

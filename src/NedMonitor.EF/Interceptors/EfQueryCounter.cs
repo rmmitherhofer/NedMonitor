@@ -64,7 +64,7 @@ public sealed class EfQueryCounter : DbCommandInterceptor
         };
 
         if (capture.Contains(CaptureOptions.Query))
-            entry.Sql = command.CommandText;
+            entry.Sql = command.CommandText?.Replace("[", "").Replace("]", "");
 
         if (capture.Contains(CaptureOptions.Parameters))
             entry.Parameters = string.Join(", ", command.Parameters.OfType<DbParameter>().Select(p => $"{p.ParameterName}={FormatValue(p.Value)}"));

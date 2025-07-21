@@ -9,8 +9,8 @@ using NedMonitor.Applications;
 using NedMonitor.BackgroundServices;
 using NedMonitor.Builders;
 using NedMonitor.Core;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Settings;
-using NedMonitor.Extensions;
 using NedMonitor.Middleware;
 using NedMonitor.Providers;
 using NedMonitor.Queues;
@@ -115,24 +115,25 @@ public static class NedMonitorConfigurations
 
         configure?.Invoke(options);
 
-        var provider = services.BuildServiceProvider();
-        var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>();
+        var monitorSection = configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE);
+        var settings = monitorSection.Get<NedMonitorSettings>();
 
-        if (!settings.Value.ExecutionMode.EnableNedMonitor) return services; 
+        if (settings?.ExecutionMode.EnableNedMonitor != true) return services; 
 
-        if (settings.Value.ExecutionMode.EnableMonitorLogs)
+        if (settings.ExecutionMode.EnableMonitorLogs)
         {
             services.AddSingleton<ILoggerProvider, LoggerProvider>(sp =>
             {
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                return new LoggerProvider(options, httpContextAccessor, settings);
+                var configOptions = sp.GetRequiredService<IOptions<NedMonitorSettings>>();
+                return new LoggerProvider(options, httpContextAccessor, configOptions);
             });
         }
 
         services.TryAddScoped<INedMonitorApplication, NedMonitorApplication>();
         services.TryAddScoped<ILogContextBuilder, LogContextBuilder>();
 
-        services.TryAddScoped<INedMonitorQueue, NedMonitorQueue>();
+        services.TryAddSingleton<INedMonitorQueue, NedMonitorQueue>();
         services.AddHostedService<NedMonitorBackgroundService>();
 
         services.AddHttpService(configuration);

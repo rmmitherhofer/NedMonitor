@@ -24,4 +24,10 @@ public class SensitiveDataMaskerSettingsHttpRequest
     /// </summary>
     [JsonPropertyName("maskValue")]
     public string? MaskValue { get; set; }
+
+    /// <summary>
+    /// A list of sensitive keys that should be masked in logs or outputs.
+    /// </summary>
+    [JsonPropertyName("sensitivePatterns")]
+    public List<string>? SensitivePatterns { get; set; }
 }
