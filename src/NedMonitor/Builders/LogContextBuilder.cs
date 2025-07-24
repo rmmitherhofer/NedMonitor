@@ -48,6 +48,14 @@ public class LogContextBuilder : ILogContextBuilder
     /// <returns>The current builder instance.</returns>
     public ILogContextBuilder WithSnapshot(Snapshot snapshot)
     {
+        _logLevel = LogLevel.None;
+        _errorCategory = null;
+        _notifications = null;
+        _logEntries = null;
+        _httpClientLogs = null;
+        _dbQueryEntries = null;
+        _exception = null;
+
         _snapshot = snapshot;
         return this;
     }
@@ -105,8 +113,7 @@ public class LogContextBuilder : ILogContextBuilder
     /// <returns>A constructed <see cref="LogContextHttpRequest"/> with aggregated data.</returns>
     public LogContextHttpRequest Build()
     {
-        _logLevel = LogLevel.None;
-        _errorCategory = null;
+
         return new LogContextHttpRequest
         {
             StartTimeUtc = _snapshot.StartTimeUtc,
