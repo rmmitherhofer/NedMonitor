@@ -105,6 +105,8 @@ public class LogContextBuilder : ILogContextBuilder
     /// <returns>A constructed <see cref="LogContextHttpRequest"/> with aggregated data.</returns>
     public LogContextHttpRequest Build()
     {
+        _logLevel = LogLevel.None;
+        _errorCategory = null;
         return new LogContextHttpRequest
         {
             StartTimeUtc = _snapshot.StartTimeUtc,
