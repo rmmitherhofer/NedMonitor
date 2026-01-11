@@ -116,8 +116,8 @@ public class LogContextBuilder : ILogContextBuilder
 
         return new LogContextHttpRequest
         {
-            StartTimeUtc = _snapshot.StartTimeUtc,
-            EndTimeUtc = _snapshot.EndTimeUtc,
+            StartTime = _snapshot.StartTime,
+            EndTime = _snapshot.EndTime,
             CorrelationId = _snapshot.CorrelationId,
             Uri = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.Path}",
             UriTemplate = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.PathTemplate}",
@@ -317,7 +317,7 @@ public class LogContextBuilder : ILogContextBuilder
             MemberType = e.MemberType,
             MemberName = e.MemberName,
             SourceLineNumber = e.LineNumber,
-            TimestampUtc = e.DateTime
+            Timestamp = e.DateTime
         });
     }
 
@@ -332,7 +332,7 @@ public class LogContextBuilder : ILogContextBuilder
             Parameters = _sensitiveDataMasker.MaskString(e.Parameters),
             Success = e.Success,
             DbContext = e.DbContext,
-            ExecutedAtUtc = e.ExecutedAtUtc,
+            ExecutedAt = e.ExecutedAt,
             DurationMs = e.DurationMs,
             ExceptionMessage = e.ExceptionMessage,
             ORM = e.ORM,
@@ -387,7 +387,7 @@ public class LogContextBuilder : ILogContextBuilder
                 Tracer = _exception.StackTrace,
                 InnerException = _exception.InnerException,
                 Source = _exception.Source,
-                TimestampUtc = _exception.TimestampUtc
+                Timestamp = _exception.Timestamp
             }
         ];
     }
@@ -401,8 +401,8 @@ public class LogContextBuilder : ILogContextBuilder
 
         return _httpClientLogs.Select(n => new HttpClientLogInfoHttpRequest
         {
-            StartTimeUtc = n.StartTime,
-            EndTimeUtc = n.EndTime,
+            StartTime = n.StartTime,
+            EndTime = n.EndTime,
             Method = n.Method,
             Url = n.FullUrl,
             TemplateUrl = n.UrlTemplate,

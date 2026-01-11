@@ -26,10 +26,10 @@ public class DbQueryEntryHttpRequest
     public string? Parameters { get; set; }
 
     /// <summary>
-    /// The timestamp when the query was executed (UTC).
+    /// The timestamp when the query was executed.
     /// </summary>
-    [JsonPropertyName("executedAtUtc")]
-    public DateTime ExecutedAtUtc { get; set; }
+    [JsonPropertyName("executedAt")]
+    public DateTime ExecutedAt { get; set; }
 
     /// <summary>
     /// The duration of the query execution in milliseconds (optional).

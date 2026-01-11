@@ -32,10 +32,10 @@ public class ExceptionInfoHttpRequest
     public string? InnerException { get; set; }
 
     /// <summary>
-    /// Timestamp (UTC) when the exception was captured.
+    /// Timestamp when the exception was captured.
     /// </summary>
-    [JsonPropertyName("timestampUtc")]
-    public DateTime TimestampUtc { get; set; }
+    [JsonPropertyName("timestamp")]
+    public DateTime Timestamp { get; set; }
 
     /// <summary>
     /// Optional context or source where the exception was thrown (e.g., class/method name).

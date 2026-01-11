@@ -57,7 +57,7 @@ public sealed class EfQueryCounter : DbCommandInterceptor
         var entry = new DbQueryEntry
         {
             Provider = DbProviderExtractor.GetFriendlyProviderName(command.Connection),
-            ExecutedAtUtc = DateTime.UtcNow,
+            ExecutedAt = DateTime.Now,
             DurationMs = durationMs ?? 0,
             Success = success,
             ORM = $"EF Core {OrmVersionCache.EfVersion}"

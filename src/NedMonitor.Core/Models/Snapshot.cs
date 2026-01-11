@@ -199,14 +199,14 @@ public class Snapshot
 
     #region Log
     /// <summary>
-    /// Gets or sets the UTC timestamp indicating when the operation started.
+    /// Gets or sets the timestamp indicating when the operation started.
     /// </summary>
-    public DateTime StartTimeUtc { get; set; }
+    public DateTime StartTime { get; set; }
 
     /// <summary>
-    /// Gets or sets the UTC timestamp indicating when the operation ended.
+    /// Gets or sets the timestamp indicating when the operation ended.
     /// </summary>
-    public DateTime EndTimeUtc { get; set; }
+    public DateTime EndTime { get; set; }
 
     /// <summary>
     /// Correlation ID for distributed tracing.
@@ -253,8 +253,8 @@ public class Snapshot
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
     /// <param name="elapsedMs">The elapsed time for the request, in milliseconds.</param>
-    /// <param name="startTimeAt">The UTC timestamp indicating when the request started.</param>
-    /// <param name="endTimeAt">The UTC timestamp indicating when the request ended.</param>
+    /// <param name="startTimeAt">The timestamp indicating when the request started.</param>
+    /// <param name="endTimeAt">The timestamp indicating when the request ended.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the completed <see cref="Snapshot"/> instance.</returns>
     public async Task<Snapshot> CaptureAsync(HttpContext context, double elapsedMs, DateTime startTimeAt, DateTime endTimeAt)
     {
@@ -277,8 +277,8 @@ public class Snapshot
 
         return new Snapshot
         {
-            StartTimeUtc = startTimeAt,
-            EndTimeUtc = endTimeAt,
+            StartTime = startTimeAt,
+            EndTime = endTimeAt,
             CorrelationId = request.GetCorrelationId(),
             TraceId = context.TraceIdentifier,
             TotalMilliseconds = elapsedMs,

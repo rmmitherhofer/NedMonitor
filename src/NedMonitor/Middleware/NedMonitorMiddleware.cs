@@ -35,7 +35,7 @@ public class NedMonitorMiddleware
     /// <param name="context">The current HTTP context.</param>
     public async Task InvokeAsync(HttpContext context, INedMonitorQueue queue)
     {
-        DateTime startAt = DateTime.UtcNow;
+        DateTime startAt = DateTime.Now;
         try
         {
             _diagnostic = new();
@@ -51,7 +51,7 @@ public class NedMonitorMiddleware
         }
         finally
         {
-            queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.UtcNow));
+            queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.Now));
         }
     }
 }

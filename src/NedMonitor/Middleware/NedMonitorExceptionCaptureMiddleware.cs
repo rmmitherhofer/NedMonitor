@@ -37,7 +37,7 @@ public class NedMonitorExceptionCaptureMiddleware
                     StackTrace = ex.StackTrace,
                     InnerException = ex.InnerException?.Message,
                     Source = ex.Source,
-                    TimestampUtc = DateTime.UtcNow
+                    Timestamp = DateTime.Now
                 };
             }
             throw;

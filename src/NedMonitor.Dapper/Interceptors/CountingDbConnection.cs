@@ -238,7 +238,7 @@ public class CountingDbConnection : IDbConnection
         var entry = new DbQueryEntry
         {
             Provider = DbProviderExtractor.GetFriendlyProviderName(_inner),
-            ExecutedAtUtc = DateTime.UtcNow,
+            ExecutedAt = DateTime.Now,
             DurationMs = (int)durationMs,
             Success = success,
             ORM = $"Dapper {OrmVersionCache.DapperVersionCached}"

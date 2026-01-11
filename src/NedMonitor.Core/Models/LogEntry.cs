@@ -39,7 +39,7 @@ public class LogEntry
     public int LineNumber { get; set; }
 
     /// <summary>
-    /// The UTC timestamp indicating when the log was created.
+    /// The timestamp indicating when the log was created.
     /// </summary>
     public DateTime DateTime { get; private set; }
 
@@ -54,6 +54,6 @@ public class LogEntry
         Category = category;
         LogLevel = logLevel;
         Message = message;
-        DateTime = DateTime.UtcNow;
+        DateTime = DateTime.Now;
     }
 }

@@ -53,7 +53,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
 
         var context = new HttpRequestLogContext
         {
-            StartTime = DateTime.UtcNow,
+            StartTime = DateTime.Now,
             Method = request.Method.Method,
             FullUrl = request.RequestUri?.ToString() ?? string.Empty,
             UrlTemplate = urlTemplate,
@@ -70,7 +70,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
             var response = await base.SendAsync(request, cancellationToken);
 
             context.StatusCode = (int)response.StatusCode;
-            context.EndTime = DateTime.UtcNow;
+            context.EndTime = DateTime.Now;
 
             context.ResponseHeaders = response.Headers
                 .Concat(response.Content?.Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
@@ -95,7 +95,7 @@ public class NedMonitorHttpLoggingHandler : DelegatingHandler
         }
         catch (Exception ex)
         {
-            context.EndTime = DateTime.UtcNow;
+            context.EndTime = DateTime.Now;
             context.ExceptionType = ex.GetType().FullName;
             context.ExceptionMessage = ex.Message;
             context.StackTrace = ex.StackTrace;

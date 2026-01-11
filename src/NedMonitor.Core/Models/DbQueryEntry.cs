@@ -17,9 +17,9 @@ public class DbQueryEntry
     public string? Parameters { get; set; }
 
     /// <summary>
-    /// The timestamp when the query was executed (UTC).
+    /// The timestamp when the query was executed.
     /// </summary>
-    public DateTime ExecutedAtUtc { get; set; }
+    public DateTime ExecutedAt { get; set; }
 
     /// <summary>
     /// The duration of the query execution in milliseconds (optional).
