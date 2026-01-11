@@ -113,14 +113,13 @@ public class LogContextBuilder : ILogContextBuilder
     /// <returns>A constructed <see cref="LogContextHttpRequest"/> with aggregated data.</returns>
     public LogContextHttpRequest Build()
     {
-
         return new LogContextHttpRequest
         {
             StartTime = _snapshot.StartTime,
             EndTime = _snapshot.EndTime,
             CorrelationId = _snapshot.CorrelationId,
             Uri = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.Path}",
-            UriTemplate = $"{_snapshot.Scheme}://{_snapshot.Host}{_snapshot.PathTemplate}",
+            UriTemplate = $"{_snapshot.Scheme}://{_snapshot.Host}/{_snapshot.PathTemplate}",
             TotalMilliseconds = _snapshot.TotalMilliseconds,
             TraceIdentifier = _snapshot.TraceId,
             RemotePort = _snapshot.RemotePort,

@@ -273,8 +273,6 @@ public class Snapshot
 
         var endpoint = context.GetEndpoint();
 
-        var test = request.IsAjaxRequest();
-
         return new Snapshot
         {
             StartTime = startTimeAt,
@@ -306,13 +304,13 @@ public class Snapshot
             RequestCookies = request.Cookies.ToDictionary(c => c.Key, v => v.Value?.ToString()),
             Host = request.Host.ToString(),
             Path = request.Path,
-            PathBase = request.PathBase.ToString(),            
+            PathBase = request.PathBase.ToString(),
             FullPath = request.GetFullUrl(),
             Referer = request.Headers["Referer"].ToString(),
             #endregion
 
             #region Response
-            StatusCode = response.StatusCode,
+            StatusCode = ResolveStatusCode(response),
             ResponseHeaders = response.Headers.ToDictionary(k => k.Key, v => v.Value.ToList()),
             ResponseBody = responseObj,
             ResponseBodySize = responseBodySizeObj is long responseBodySize ? responseBodySize : 0,
@@ -402,6 +400,43 @@ public class Snapshot
                 return body;
             }
         }
+    }
+
+    private static int ResolveStatusCode(HttpResponse response)
+    {
+        var statusCode = response.StatusCode;
+
+        if (response.Headers.TryGetValue("X-Error-Code", out var errorCodeValues) &&
+            int.TryParse(errorCodeValues.FirstOrDefault(), out var explicitCode))
+        {
+            return explicitCode;
+        }
+
+        if (statusCode < StatusCodes.Status300MultipleChoices ||
+            statusCode >= StatusCodes.Status400BadRequest)
+        {
+            return statusCode;
+        }
+
+        if (!response.Headers.TryGetValue("Location", out var locationValues))
+            return statusCode;
+
+        var location = locationValues.ToString();
+        if (string.IsNullOrWhiteSpace(location))
+            return statusCode;
+
+        if (!location.Contains("/error/", StringComparison.OrdinalIgnoreCase))
+            return statusCode;
+
+        var lastSegment = location
+            .Split('?', '#')[0]
+            .TrimEnd('/')
+            .Split('/')
+            .LastOrDefault();
+
+        return int.TryParse(lastSegment, out var extractedStatus)
+            ? extractedStatus
+            : statusCode;
     }
 }
 
