@@ -406,8 +406,8 @@ public class Snapshot
     {
         var statusCode = response.StatusCode;
 
-        if (response.Headers.TryGetValue("X-Error-Code", out var errorCodeValues) &&
-            int.TryParse(errorCodeValues.FirstOrDefault(), out var explicitCode))
+        if (response.Headers.TryGetValue("X-Original-Status-Code", out var originalCodeValues) &&
+            int.TryParse(originalCodeValues.FirstOrDefault(), out var explicitCode))
         {
             return explicitCode;
         }
