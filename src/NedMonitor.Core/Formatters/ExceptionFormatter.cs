@@ -67,7 +67,7 @@ public class ExceptionFormatter
 
         Exception baseException = ex.GetBaseException();
 
-        if (baseException is not null)
+        if (baseException is not null && !ReferenceEquals(baseException, ex))
             FormatException(baseException, sb, "Base Exception:");
     }
 }

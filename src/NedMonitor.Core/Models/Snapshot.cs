@@ -307,6 +307,7 @@ public class Snapshot
             PathBase = request.PathBase.ToString(),
             FullPath = request.GetFullUrl(),
             Referer = request.Headers["Referer"].ToString(),
+            HasFormContentType = request.HasFormContentType,
             #endregion
 
             #region Response
@@ -363,8 +364,6 @@ public class Snapshot
     {
         if (context.Request.HasFormContentType)
         {
-            HasFormContentType = true;
-
             var form = await context.Request.ReadFormAsync();
             var dict = form.ToDictionary(x => x.Key, x => (object)x.Value.ToString());
 
@@ -401,6 +400,7 @@ public class Snapshot
             }
         }
     }
+
 
     private static int ResolveStatusCode(HttpResponse response)
     {
