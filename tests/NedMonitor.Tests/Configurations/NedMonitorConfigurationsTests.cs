@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,42 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
 
         //When
         var act = () => services.AddNedMonitor(configuration);
+
+        //Then
+        act.Should().Throw<ArgumentNullException>();
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given null app, " +
+        "When using NedMonitor, " +
+        "Then it throws")]
+    [Trait("Configurations", nameof(NedMonitorConfigurations))]
+    public async Task UseNedMonitor_NullApp_Throws()
+    {
+        //Given
+        IApplicationBuilder app = null!;
+
+        //When
+        var act = () => app.UseNedMonitor();
+
+        //Then
+        act.Should().Throw<ArgumentNullException>();
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given null app, " +
+        "When using NedMonitor middleware, " +
+        "Then it throws")]
+    [Trait("Configurations", nameof(NedMonitorConfigurations))]
+    public async Task UseNedMonitorMiddleware_NullApp_Throws()
+    {
+        //Given
+        IApplicationBuilder app = null!;
+
+        //When
+        var act = () => app.UseNedMonitorMiddleware();
 
         //Then
         act.Should().Throw<ArgumentNullException>();
@@ -121,6 +158,32 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
         settings.SensitiveDataMasking.SensitiveKeys.Should().Contain("token");
         settings.SensitiveDataMasking.SensitiveKeys.Should().Contain("secret");
         settings.SensitiveDataMasking.SensitiveKeys.Should().Contain(NedMonitorConstants.DEFAULT_KEYS);
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given duplicate sensitive keys with different casing, " +
+        "When adding options, " +
+        "Then it keeps a single entry")]
+    [Trait("Configurations", nameof(NedMonitorConfigurations))]
+    public async Task AddOptions_DuplicateSensitiveKeys_KeepsSingleEntry()
+    {
+        //Given
+        var services = new ServiceCollection();
+        var configuration = BuildConfiguration(
+            enableNedMonitor: true,
+            enableMonitorDbQueries: true,
+            sensitiveKeys: ["Token", "token"]);
+
+        //When
+        services.AddOptions(configuration);
+        var provider = services.BuildServiceProvider();
+        var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
+
+        //Then
+        settings.SensitiveDataMasking.SensitiveKeys
+            .Count(key => string.Equals(key, "token", StringComparison.OrdinalIgnoreCase))
+            .Should().Be(1);
         await Task.CompletedTask;
     }
 

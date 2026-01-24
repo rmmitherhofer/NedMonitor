@@ -87,6 +87,28 @@ public class CountingDbConnectionTests(ITestOutputHelper output)
     }
 
     [Fact(DisplayName =
+        "Given capture options null, " +
+        "When executing with logging, " +
+        "Then it increments but does not add query log")]
+    [Trait("Interceptors", nameof(CountingDbConnection))]
+    public async Task ExecuteWithLogging_CaptureNull_DoesNotLog()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, null);
+        var connection = CreateConnection(context, counter, settings);
+
+        //When
+        InvokeExecuteWithLogging(connection, () => 1, "select 1", new { id = 1 });
+
+        //Then
+        counter.Count.Should().Be(1);
+        context.Items.Should().NotContainKey(NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY);
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
         "Given query and parameters capture, " +
         "When executing with logging, " +
         "Then it stores query entry")]
@@ -259,7 +281,60 @@ public class CountingDbConnectionTests(ITestOutputHelper output)
         await Task.CompletedTask;
     }
 
-    private static NedMonitorSettings CreateSettings(bool enabled, List<CaptureOptions> captureOptions)
+    [Fact(DisplayName =
+        "Given async execution and query capture, " +
+        "When executing with logging, " +
+        "Then it stores query entry")]
+    [Trait("Interceptors", nameof(CountingDbConnection))]
+    public async Task ExecuteWithLoggingAsync_CaptureQuery_LogsEntry()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, [CaptureOptions.Query]);
+        var connection = CreateConnection(context, counter, settings);
+
+        //When
+        await InvokeExecuteWithLoggingAsync(connection, () => Task.FromResult(1), "select 1", new { id = 1 });
+
+        //Then
+        counter.Count.Should().Be(1);
+        var list = context.Items[NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY]
+            .Should().BeOfType<List<DbQueryEntry>>().Which;
+        list.Should().HaveCount(1);
+        list[0].Sql.Should().Be("select 1");
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given async execution throws and exception capture, " +
+        "When executing with logging, " +
+        "Then it stores exception message")]
+    [Trait("Interceptors", nameof(CountingDbConnection))]
+    public async Task ExecuteWithLoggingAsync_Exception_LogsMessage()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, [CaptureOptions.ExceptionMessage]);
+        var connection = CreateConnection(context, counter, settings);
+
+        //When
+        var act = () => InvokeExecuteWithLoggingAsync<int>(connection, () =>
+            Task.FromException<int>(new InvalidOperationException("boom")), "select 1", new { });
+
+        //Then
+        await act.Should().ThrowAsync<InvalidOperationException>();
+        counter.Count.Should().Be(1);
+        var list = context.Items[NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY]
+            .Should().BeOfType<List<DbQueryEntry>>().Which;
+        list.Should().HaveCount(1);
+        list[0].Success.Should().BeFalse();
+        list[0].ExceptionMessage.Should().Be("boom");
+        await Task.CompletedTask;
+    }
+
+    private static NedMonitorSettings CreateSettings(bool enabled, List<CaptureOptions>? captureOptions)
     {
         return new NedMonitorSettings
         {
@@ -305,6 +380,26 @@ public class CountingDbConnectionTests(ITestOutputHelper output)
         try
         {
             return (T)generic.Invoke(connection, [func, sql, param])!;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw ex.InnerException;
+        }
+    }
+
+    private static async Task<T> InvokeExecuteWithLoggingAsync<T>(
+        CountingDbConnection connection,
+        Func<Task<T>> func,
+        string sql,
+        object? param)
+    {
+        var method = typeof(CountingDbConnection)
+            .GetMethod("ExecuteWithLoggingAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+        var generic = method!.MakeGenericMethod(typeof(T));
+        try
+        {
+            var task = (Task<T>)generic.Invoke(connection, [func, sql, param])!;
+            return await task;
         }
         catch (TargetInvocationException ex) when (ex.InnerException is not null)
         {

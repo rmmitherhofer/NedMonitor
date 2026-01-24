@@ -215,6 +215,44 @@ public class DynamicParametersExtensionsTests(ITestOutputHelper output)
         await Task.CompletedTask;
     }
 
+    [Fact(DisplayName =
+        "Given parameters with value field, " +
+        "When getting declared parameters, " +
+        "Then it reads the value field")]
+    [Trait("Extensions", nameof(DynamicParametersExtensions))]
+    public async Task GetDeclaredParameters_ValueField_ReadsValue()
+    {
+        //Given
+        var parameters = new WithValueFieldParameter();
+
+        //When
+        var result = DynamicParametersExtensions.GetDeclaredParameters(parameters);
+
+        //Then
+        result.Should().ContainKey("field");
+        result["field"].Should().Be("field");
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given parameters with _value field, " +
+        "When getting declared parameters, " +
+        "Then it reads the _value field")]
+    [Trait("Extensions", nameof(DynamicParametersExtensions))]
+    public async Task GetDeclaredParameters_UnderscoreValueField_ReadsValue()
+    {
+        //Given
+        var parameters = new WithUnderscoreValueFieldParameter();
+
+        //When
+        var result = DynamicParametersExtensions.GetDeclaredParameters(parameters);
+
+        //Then
+        result.Should().ContainKey("underscore");
+        result["underscore"].Should().Be("underscore");
+        await Task.CompletedTask;
+    }
+
     private sealed class NoParameters
     {
     }
@@ -288,6 +326,22 @@ public class DynamicParametersExtensionsTests(ITestOutputHelper output)
         };
     }
 
+    private sealed class WithValueFieldParameter
+    {
+        private readonly System.Collections.IDictionary parameters = new Dictionary<string, object?>
+        {
+            ["field"] = new WithValueField("field")
+        };
+    }
+
+    private sealed class WithUnderscoreValueFieldParameter
+    {
+        private readonly System.Collections.IDictionary parameters = new Dictionary<string, object?>
+        {
+            ["underscore"] = new WithUnderscoreValueField("underscore")
+        };
+    }
+
     private sealed class ComplexPayload
     {
         public ComplexPayload(string data) => Data = data;
@@ -304,5 +358,11 @@ public class DynamicParametersExtensionsTests(ITestOutputHelper output)
     {
         private readonly object _value;
         public WithValueField(object value) => _value = value;
+    }
+
+    private sealed class WithUnderscoreValueField
+    {
+        private readonly object _value;
+        public WithUnderscoreValueField(object value) => _value = value;
     }
 }

@@ -43,6 +43,28 @@ public class EfQueryCounterTests(ITestOutputHelper output)
     }
 
     [Fact(DisplayName =
+        "Given empty capture options, " +
+        "When adding log, " +
+        "Then it does not store entries")]
+    [Trait("Interceptors", nameof(EfQueryCounter))]
+    public async Task AddLog_EmptyCaptureOptions_DoesNotLog()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, []);
+        var interceptor = CreateInterceptor(context, counter, settings);
+        var command = new FakeDbCommand();
+
+        //When
+        InvokeAddLog(interceptor, command, true, null, 1);
+
+        //Then
+        context.Items.Should().NotContainKey(NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY);
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
         "Given interceptor disabled, " +
         "When adding log, " +
         "Then it does not store entries")]
@@ -94,6 +116,34 @@ public class EfQueryCounterTests(ITestOutputHelper output)
         list[0].Parameters.Should().Contain("p1=\"text\"");
         list[0].Parameters.Should().Contain("p2=123");
         list[0].Success.Should().BeTrue();
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given query capture and null sql, " +
+        "When adding log, " +
+        "Then it stores null sql")]
+    [Trait("Interceptors", nameof(EfQueryCounter))]
+    public async Task AddLog_CaptureQuery_NullSql_StoresNull()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, [CaptureOptions.Query]);
+        var interceptor = CreateInterceptor(context, counter, settings);
+        var command = new FakeDbCommand
+        {
+            CommandText = null
+        };
+
+        //When
+        InvokeAddLog(interceptor, command, true, null, 1);
+
+        //Then
+        var list = context.Items[NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY]
+            .Should().BeOfType<List<DbQueryEntry>>().Which;
+        list.Should().HaveCount(1);
+        list[0].Sql.Should().BeNull();
         await Task.CompletedTask;
     }
 
@@ -153,6 +203,32 @@ public class EfQueryCounterTests(ITestOutputHelper output)
     }
 
     [Fact(DisplayName =
+        "Given parameters capture and null parameter, " +
+        "When adding log, " +
+        "Then it stores null value")]
+    [Trait("Interceptors", nameof(EfQueryCounter))]
+    public async Task AddLog_CaptureParameters_NullValue_StoresNull()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, [CaptureOptions.Parameters]);
+        var interceptor = CreateInterceptor(context, counter, settings);
+        var command = new FakeDbCommand();
+        command.Parameters.Add(new FakeDbParameter("p1", null));
+
+        //When
+        InvokeAddLog(interceptor, command, true, null, 1);
+
+        //Then
+        var list = context.Items[NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY]
+            .Should().BeOfType<List<DbQueryEntry>>().Which;
+        list.Should().HaveCount(1);
+        list[0].Parameters.Should().Contain("p1=null");
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
         "Given no http context, " +
         "When adding log, " +
         "Then it does not store entries")]
@@ -195,6 +271,32 @@ public class EfQueryCounterTests(ITestOutputHelper output)
             .Should().BeOfType<List<DbQueryEntry>>().Which;
         list.Should().HaveCount(1);
         list[0].DurationMs.Should().Be(0);
+        await Task.CompletedTask;
+    }
+
+    [Fact(DisplayName =
+        "Given context capture and null connection, " +
+        "When adding log, " +
+        "Then it does not set db context")]
+    [Trait("Interceptors", nameof(EfQueryCounter))]
+    public async Task AddLog_Context_NullConnection_DoesNotSetDbContext()
+    {
+        //Given
+        var context = new DefaultHttpContext();
+        var counter = new FakeCounter();
+        var settings = CreateSettings(enabled: true, [CaptureOptions.Context]);
+        var interceptor = CreateInterceptor(context, counter, settings);
+        var command = new FakeDbCommand();
+        command.ClearConnection();
+
+        //When
+        InvokeAddLog(interceptor, command, true, null, 1);
+
+        //Then
+        var list = context.Items[NedMonitorConstants.CONTEXT_QUERY_LOGS_KEY]
+            .Should().BeOfType<List<DbQueryEntry>>().Which;
+        list.Should().HaveCount(1);
+        list[0].DbContext.Should().BeNull();
         await Task.CompletedTask;
     }
 
@@ -363,6 +465,8 @@ public class EfQueryCounterTests(ITestOutputHelper output)
         public override void Prepare() { }
         protected override DbParameter CreateDbParameter() => new FakeDbParameter("", null);
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior) => throw new NotSupportedException();
+
+        public void ClearConnection() => DbConnection = null;
     }
 
     private sealed class FakeDbParameter : DbParameter

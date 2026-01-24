@@ -810,6 +810,108 @@ public class SnapshotTests(ITestOutputHelper output)
         snapshot.Notifications.Should().HaveCount(1);
     }
 
+    [Fact(DisplayName =
+        "Given forwarded header and remote ip, " +
+        "When capturing snapshot, " +
+        "Then it uses forwarded ip")]
+    [Trait("Models", nameof(Snapshot))]
+    public async Task CaptureAsync_UsesForwardedIp()
+    {
+        //Given
+        var context = CreateContext();
+        context.Request.Headers["X-Forwarded-For"] = "9.9.9.9";
+        context.Connection.RemoteIpAddress = System.Net.IPAddress.Parse("10.0.0.1");
+
+        //When
+        var snapshot = await new Snapshot().CaptureAsync(
+            context,
+            elapsedMs: 5,
+            startTimeAt: DateTime.UtcNow.AddMilliseconds(-5),
+            endTimeAt: DateTime.UtcNow);
+
+        //Then
+        snapshot.IpAddress.Should().Be("9.9.9.9");
+    }
+
+    [Fact(DisplayName =
+        "Given response body size missing, " +
+        "When capturing snapshot, " +
+        "Then it defaults response body size to zero")]
+    [Trait("Models", nameof(Snapshot))]
+    public async Task CaptureAsync_MissingResponseBodySize_DefaultsToZero()
+    {
+        //Given
+        var context = CreateContext();
+        context.Items.Remove(NedMonitorConstants.CONTEXT_REPONSE_BODY_SIZE_KEY);
+
+        //When
+        var snapshot = await new Snapshot().CaptureAsync(
+            context,
+            elapsedMs: 5,
+            startTimeAt: DateTime.UtcNow.AddMilliseconds(-5),
+            endTimeAt: DateTime.UtcNow);
+
+        //Then
+        snapshot.ResponseBodySize.Should().Be(0);
+    }
+
+    [Fact(DisplayName =
+        "Given request cookies, " +
+        "When capturing snapshot, " +
+        "Then it maps cookie values")]
+    [Trait("Models", nameof(Snapshot))]
+    public async Task CaptureAsync_MapsRequestCookies()
+    {
+        //Given
+        var context = CreateContext();
+        context.Request.Headers["Cookie"] = "a=1; b=2";
+
+        //When
+        var snapshot = await new Snapshot().CaptureAsync(
+            context,
+            elapsedMs: 5,
+            startTimeAt: DateTime.UtcNow.AddMilliseconds(-5),
+            endTimeAt: DateTime.UtcNow);
+
+        //Then
+        snapshot.RequestCookies.Should().ContainKey("a");
+        snapshot.RequestCookies.Should().ContainKey("b");
+        snapshot.RequestCookies!["a"].Should().Be("1");
+        snapshot.RequestCookies!["b"].Should().Be("2");
+    }
+
+    [Fact(DisplayName =
+        "Given http client log with exception, " +
+        "When capturing snapshot, " +
+        "Then dependency is marked as failed")]
+    [Trait("Models", nameof(Snapshot))]
+    public async Task CaptureAsync_HttpLogWithException_MarksDependencyFailed()
+    {
+        //Given
+        var context = CreateContext();
+        var httpLog = new HttpRequestLogContext
+        {
+            StartTime = DateTime.UtcNow.AddMilliseconds(-10),
+            EndTime = DateTime.UtcNow,
+            FullUrl = "https://example.local/api",
+            UrlTemplate = "/api",
+            StatusCode = 200,
+            ExceptionType = "System.Exception"
+        };
+        context.Items[NedMonitorConstants.CONTEXT_HTTP_CLIENT_LOGS_KEY] = new List<HttpRequestLogContext> { httpLog };
+
+        //When
+        var snapshot = await new Snapshot().CaptureAsync(
+            context,
+            elapsedMs: 10,
+            startTimeAt: DateTime.UtcNow.AddMilliseconds(-10),
+            endTimeAt: DateTime.UtcNow);
+
+        //Then
+        snapshot.Dependencies.Should().ContainSingle();
+        snapshot.Dependencies!.First().Success.Should().BeFalse();
+    }
+
     private static DefaultHttpContext CreateContext()
     {
         var context = HttpContextFaker.Create(
