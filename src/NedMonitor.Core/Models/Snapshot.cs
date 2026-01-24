@@ -261,6 +261,7 @@ public class Snapshot
         var request = context.Request;
         var response = context.Response;
         var user = context.User;
+        var hasFormContentType = IsFormContentType(request);
 
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_REPONSE_BODY_KEY, out var responseObj);
         context.Items.TryGetValue(NedMonitorConstants.CONTEXT_EXCEPTION_KEY, out var exceptionObj);
@@ -298,7 +299,7 @@ public class Snapshot
             RequestHeaders = request.Headers.ToDictionary(k => k.Key, v => v.Value.ToList()),
             RequestContentType = request.GetContentType(),
             RequestContentLength = request.ContentLength ?? 0,
-            RequestBody = GetRequestBodyAsync(context),
+            RequestBody = GetRequestBodyAsync(context, hasFormContentType),
             IsAjaxRequest = request.IsAjaxRequest(),
             IpAddress = request.GetIpAddress(),
             RequestCookies = request.Cookies.ToDictionary(c => c.Key, v => v.Value?.ToString()),
@@ -307,6 +308,7 @@ public class Snapshot
             PathBase = request.PathBase.ToString(),
             FullPath = request.GetFullUrl(),
             Referer = request.Headers["Referer"].ToString(),
+            HasFormContentType = hasFormContentType,
             #endregion
 
             #region Response
@@ -359,12 +361,10 @@ public class Snapshot
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
     /// <returns>The deserialized request body or raw content.</returns>
-    private async Task<object?> GetRequestBodyAsync(HttpContext context)
+    private async Task<object?> GetRequestBodyAsync(HttpContext context, bool hasFormContentType)
     {
-        if (context.Request.HasFormContentType)
+        if (hasFormContentType)
         {
-            HasFormContentType = true;
-
             var form = await context.Request.ReadFormAsync();
             var dict = form.ToDictionary(x => x.Key, x => (object)x.Value.ToString());
 
@@ -400,6 +400,19 @@ public class Snapshot
                 return body;
             }
         }
+    }
+
+    private static bool IsFormContentType(HttpRequest request)
+    {
+        if (request.HasFormContentType)
+            return true;
+
+        var contentType = request.ContentType;
+        if (string.IsNullOrWhiteSpace(contentType))
+            return false;
+
+        return contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)
+            || contentType.StartsWith("multipart/form-data", StringComparison.OrdinalIgnoreCase);
     }
 
     private static int ResolveStatusCode(HttpResponse response)
