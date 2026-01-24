@@ -120,6 +120,7 @@ Se preferir, use `PackageReference`:
   "NedMonitor": {
     "ProjectId": "00000000-0000-0000-0000-000000000000",
     "ProjectType": "Api",
+    "MinimumLogLevel": "Information",
     "ExecutionMode": {
       "EnableNedMonitor": true,
       "EnableMonitorExceptions": true,
@@ -139,6 +140,12 @@ Se preferir, use `PackageReference`:
       "SensitiveKeys": ["password", "token"],
       "SensitivePatterns": [],
       "MaskValue": "***REDACTED***"
+    },
+    "Exceptions": {
+      "Expected": [
+        "System.OperationCanceledException",
+        "System.Threading.Tasks.TaskCanceledException"
+      ]
     },
     "DataInterceptors": {
       "EF": {
