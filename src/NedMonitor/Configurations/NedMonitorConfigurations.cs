@@ -14,9 +14,6 @@ using NedMonitor.Core.Settings;
 using NedMonitor.Middleware;
 using NedMonitor.Providers;
 using NedMonitor.Queues;
-using Zypher.Extensions.Core;
-using Zypher.Http.Configurations;
-using Zypher.Notifications.Configurations;
 
 namespace NedMonitor.Configurations;
 
@@ -37,9 +34,7 @@ public static class NedMonitorConfigurations
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
 
-        services.AddNotificationConfig();
-
-        services.AddHttpConfig();
+        services.AddHttpContextAccessor();
 
         services.AddOptions(configuration);
 
@@ -149,8 +144,6 @@ public static class NedMonitorConfigurations
     public static IApplicationBuilder UseNedMonitor(this IApplicationBuilder app)
     {
         ArgumentNullException.ThrowIfNull(app, nameof(IApplicationBuilder));
-
-        app.UseHttpConfig();
 
         var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 

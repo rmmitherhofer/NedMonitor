@@ -7,8 +7,6 @@ using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
-using Zypher.Json;
-using Zypher.Notifications.Messages;
 
 namespace NedMonitor.Builders;
 

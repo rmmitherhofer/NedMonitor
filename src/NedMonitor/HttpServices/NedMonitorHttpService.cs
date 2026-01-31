@@ -1,43 +1,59 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
+using NedMonitor.HttpResponses;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Zypher.Extensions.Core;
-using Zypher.Http;
-using Zypher.Http.Exceptions;
-using Zypher.Http.Extensions;
-using Zypher.Json;
-using Zypher.Logs.Extensions;
-using Zypher.Notifications.Interfaces;
-using Zypher.Responses;
+using System.Text.Json;
 
 namespace NedMonitor.HttpServices;
 
 /// <summary>
 /// HTTP service responsible for sending structured log data to the NedMonitor logging API endpoint.
-/// Handles serialization, header injection, error parsing, and internal logging.
+/// Handles serialization, header injection, error parsing, and public logging.
 /// </summary>
-public class NedMonitorHttpService : HttpService, INedMonitorHttpService
+public class NedMonitorHttpService : INedMonitorHttpService
 {
+    /// <summary>
+    /// HTTP client instance used for sending requests.
+    /// </summary>
+    private readonly HttpClient _httpClient;
+    /// <summary>
+    /// Logger for logging request and response inf
+    /// </summary>
+    private readonly ILogger<NedMonitorHttpService> _logger;
     private readonly NedMonitorSettings _settings;
+    /// <summary>
+    /// Stopwatch for measuring request duration.
+    /// </summary>
+    private Stopwatch _stopwatch;
+    /// <summary>
+    /// Indicates whether detailed request and response logging (headers and body) is enabled.
+    /// </summary>
+    private bool IsDetailedLoggingEnabled = false;
+    /// <summary>
+    /// Stores the URI template used to identify the logical route in logs.
+    /// </summary>
+    private string _templateUri = string.Empty;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NedMonitorHttpService"/> class.
     /// </summary>
     /// <param name="httpClient">An instance of <see cref="HttpClient"/> configured for outbound requests.</param>
     /// <param name="notification">Domain notification handler for validation and processing errors.</param>
-    /// <param name="logger">Typed logger for capturing internal service operations.</param>
+    /// <param name="logger">Typed logger for capturing public service operations.</param>
     /// <param name="options">Injected settings containing the NedMonitor configuration.</param>
 
-    public NedMonitorHttpService(
-        HttpClient httpClient,
-        INotificationHandler notification,
-        ILogger<NedMonitorHttpService> logger,
-        IOptions<NedMonitorSettings> options
-    ) : base(httpClient, notification, logger) => _settings = options.Value;
+    public NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHttpService> logger, IOptions<NedMonitorSettings> options)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+        _settings = options.Value;
+    }
 
     /// <summary>
     /// Sends a <see cref="LogContextHttpRequest"/> payload to the configured NedMonitor API endpoint.
@@ -66,13 +82,13 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
             if (response.HasErrors())
                 await Print(response);
         }
-        catch (CustomHttpRequestException ex)
+        catch (HttpRequestException ex)
         {
-            _logger.LogFail($"{log.CorrelationId}|" + ex.Message);
+            _logger.LogError($"{log.CorrelationId}|" + ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogCrit($"{log.CorrelationId}|" + ex.Message);
+            _logger.LogCritical($"{log.CorrelationId}|" + ex.Message);
         }
     }
     /// <summary>
@@ -84,21 +100,20 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
     private async Task Print(HttpResponseMessage response)
     {
         StringBuilder sb = new();
-        ApiResponse apiResponse = null;
+        ApiHttpResponse apiResponse = null;
 
         try
         {
-            apiResponse = await response.ReadAsAsync<ApiResponse>();
+            apiResponse = await response.ReadAsAsync<ApiHttpResponse>();
 
             if (apiResponse is null)
-                throw new CustomHttpRequestException();
+                throw new HttpRequestException();
         }
         catch (Exception)
         {
-            throw new CustomHttpRequestException(
-                response.StatusCode,
-                $"{response.RequestMessage.Method} - {response.RequestMessage.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}"
-            );
+            throw new HttpRequestException($"{response.RequestMessage.Method} - {response.RequestMessage.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}", 
+                null, 
+                response.StatusCode);
         }
 
         sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|StatusCode:{(int)response.StatusCode} - {response.StatusCode}");
@@ -230,4 +245,100 @@ public class NedMonitorHttpService : HttpService, INedMonitorHttpService
         if (!string.IsNullOrEmpty(userAccountCode))
             _httpClient.AddHeader(HttpRequestExtensions.USER_ACCOUNT_CODE, userAccountCode);
     }
+
+    private void EnableLogHeadersAndBody() => IsDetailedLoggingEnabled = true;
+
+    #region Logs
+
+    /// <summary>
+    /// Logs the start of an HTTP request including method, URI, headers, and optional content.
+    /// </summary>
+    private void LogRequest(string httpMehod, Uri uri, HttpContent? content = null)
+    {
+        _stopwatch = new();
+        _stopwatch.Start();
+
+        var headersJson = string.Empty;
+        var contentJson = string.Empty;
+        if (IsDetailedLoggingEnabled)
+        {
+            headersJson = $"|Headers:{_httpClient.GetHeadersJsonFormat()}";
+
+            if (content is not null)
+                contentJson = $"|Content:{content.ReadAsStringAsync().Result}";
+        }
+        _logger.LogInformation($"Start processing HTTP request {httpMehod} {(string.IsNullOrEmpty(_templateUri) ? uri : _httpClient.BaseAddress + _templateUri)}{headersJson}{contentJson}");
+    }
+
+    /// <summary>
+    /// Logs the end of an HTTP request including method, URI, elapsed time and response status.
+    /// </summary>
+    protected void LogResponse(HttpResponseMessage response)
+    {
+        _stopwatch.Stop();
+
+        string message = $"End processing HTTP request {response?.RequestMessage?.Method} {(string.IsNullOrEmpty(_templateUri) ? response?.RequestMessage?.RequestUri : _httpClient.BaseAddress + _templateUri)} after {_stopwatch.GetFormattedTime()} - {(int)response.StatusCode}-{response.StatusCode}";
+
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.OK:
+            case HttpStatusCode.Created:
+            case HttpStatusCode.Accepted:
+            case HttpStatusCode.NoContent:
+            case HttpStatusCode.Continue:
+            case HttpStatusCode.ResetContent:
+            case HttpStatusCode.PartialContent:
+            case HttpStatusCode.MultiStatus:
+            case HttpStatusCode.AlreadyReported:
+            case HttpStatusCode.IMUsed:
+                _logger.LogInformation(message);
+                break;
+            case HttpStatusCode.BadRequest:
+            case HttpStatusCode.Unauthorized:
+            case HttpStatusCode.PaymentRequired:
+            case HttpStatusCode.Forbidden:
+            case HttpStatusCode.NotFound:
+            case HttpStatusCode.MethodNotAllowed:
+            case HttpStatusCode.NotAcceptable:
+            case HttpStatusCode.ProxyAuthenticationRequired:
+            case HttpStatusCode.RequestTimeout:
+            case HttpStatusCode.Conflict:
+            case HttpStatusCode.Gone:
+            case HttpStatusCode.LengthRequired:
+            case HttpStatusCode.PreconditionFailed:
+            case HttpStatusCode.RequestEntityTooLarge:
+            case HttpStatusCode.RequestUriTooLong:
+            case HttpStatusCode.UnsupportedMediaType:
+            case HttpStatusCode.RequestedRangeNotSatisfiable:
+            case HttpStatusCode.ExpectationFailed:
+            case HttpStatusCode.MisdirectedRequest:
+            case HttpStatusCode.UnprocessableEntity:
+            case HttpStatusCode.Locked:
+            case HttpStatusCode.FailedDependency:
+            case HttpStatusCode.UpgradeRequired:
+            case HttpStatusCode.PreconditionRequired:
+            case HttpStatusCode.TooManyRequests:
+            case HttpStatusCode.RequestHeaderFieldsTooLarge:
+            case HttpStatusCode.UnavailableForLegalReasons:
+                _logger.LogWarning(message);
+                break;
+            case HttpStatusCode.InternalServerError:
+            case HttpStatusCode.NotImplemented:
+            case HttpStatusCode.BadGateway:
+            case HttpStatusCode.ServiceUnavailable:
+            case HttpStatusCode.GatewayTimeout:
+            case HttpStatusCode.HttpVersionNotSupported:
+            case HttpStatusCode.VariantAlsoNegotiates:
+            case HttpStatusCode.InsufficientStorage:
+            case HttpStatusCode.LoopDetected:
+            case HttpStatusCode.NotExtended:
+            case HttpStatusCode.NetworkAuthenticationRequired:
+                _logger.LogError(message);
+                break;
+            default:
+                _logger.LogCritical(message);
+                break;
+        }
+    }
+    #endregion
 }

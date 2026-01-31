@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor</PackageId>
-		<Version>1.0.14</Version>
+		<Version>2.0.0</Version>
 		<Authors>Renato Mitherhofer</Authors>
 
 		<Title>NedMonitor Core Monitoring Library</Title>
@@ -35,11 +35,10 @@
 		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net9.0" />
 		<None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib\net8.0" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="NedMonitor.Core" Version="1.1.11" />
-	</ItemGroup>
 	<ItemGroup>
 		<None Include="assets/icon.png" Pack="true" PackagePath="assets/" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="NedMonitor.Core" Version="2.0.0" />
 	</ItemGroup>
 </Project>
