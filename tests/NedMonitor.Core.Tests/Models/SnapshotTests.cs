@@ -2,13 +2,13 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 using NedMonitor.Common.Tests;
 using NedMonitor.Common.Tests.FakerFactory;
 using NedMonitor.Core.Models;
+using NedMonitor.HttpResponses;
 using System.Text;
 using Xunit.Abstractions;
-using Zypher.Notifications.Messages;
-using Microsoft.Extensions.Primitives;
 
 namespace NedMonitor.Core.Tests.Models;
 
@@ -794,7 +794,11 @@ public class SnapshotTests(ITestOutputHelper output)
         var context = CreateContext();
         var notifications = new List<Notification>
         {
-            new Notification("key", "value")
+            new()
+            {
+                Key = "key",
+                Value = "value"
+            }
         };
         context.Items[NedMonitorConstants.CONTEXT_NOTIFICATIONS_KEY] = notifications;
 

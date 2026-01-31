@@ -1,26 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
-using Moq;
 using System.ComponentModel.DataAnnotations;
 using Xunit.Abstractions;
-using Zypher.Notifications.Handlers;
-using Zypher.Notifications.Interfaces;
-using Zypher.Notifications.Messages;
+
 
 namespace NedMonitor.Common.Tests;
 
-public abstract class Test
+public abstract class Test(ITestOutputHelper output)
 {
-    protected readonly ITestOutputHelper _output;
-    protected readonly INotificationHandler _notification;
-
-    protected Test(ITestOutputHelper output)
-    {
-        _output = output;
-        var logger = new Mock<ILogger<NotificationHandler>>();
-        _notification = new NotificationHandler(new HttpContextAccessor(), logger.Object);
-    }
+    protected readonly ITestOutputHelper _output = output;
 
     public void Print(IEnumerable<ValidationResult> validationResults, object? result = null)
     {
@@ -36,24 +24,6 @@ public abstract class Test
 
         foreach (var error in validationResults)
             detail += error.ErrorMessage + Environment.NewLine;
-
-        _output.WriteLine("são elas: " + Environment.NewLine + detail);
-    }
-
-    public void Print(IEnumerable<Notification> notifications, object? result = null)
-    {
-        if (!notifications.Any())
-        {
-            Print(result);
-            return;
-        }
-
-        _output.WriteLine($"Foram encontrados {notifications.Count()} notificações nesta validação: " + Environment.NewLine);
-
-        string detail = string.Empty;
-
-        foreach (var notification in notifications)
-            detail += $"{notification.Type} - {notification.Key} - {notification.Value}" + Environment.NewLine;
 
         _output.WriteLine("são elas: " + Environment.NewLine + detail);
     }
@@ -105,23 +75,6 @@ public abstract class Test
     public void Print(object? result = null)
     {
         if (result is not null)
-            _output.WriteLine($"Teste em {result} validado com sucesso" + Environment.NewLine);
-
-        if (_notification.HasNotifications())
-        {
-            _output.WriteLine("Não foram encontradas notificações nesta validação");
-            return;
-        }
-
-        _output.WriteLine($"Fora encontradas {_notification.Get().Count()} notificações nesta validação: " + Environment.NewLine);
-
-        string detail = string.Empty;
-
-        foreach (var notification in _notification.Get())
-            detail += notification.Value + Environment.NewLine;
-
-        _notification.Clear();
-
-        _output.WriteLine("são elas: " + Environment.NewLine + detail);
+            _output.WriteLine($"Teste em {result} validado com sucesso" + Environment.NewLine); 
     }
 }

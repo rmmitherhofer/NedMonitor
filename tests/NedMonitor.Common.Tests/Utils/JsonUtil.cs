@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Zypher.Json;
+using System.Text.Json;
 
 namespace NedMonitor.Common.Tests.Utils;
 
@@ -21,6 +21,6 @@ public static class JsonUtil
     public static TDto? GetDto<TDto>(string path)
     {
         var json = GetJsonFile(path);
-        return JsonExtensions.Deserialize<TDto>(json);
+        return JsonSerializer.Deserialize<TDto>(json);
     }
 }

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Settings;
 using NedMonitor.Http.Handlers;
-using Zypher.Http.Extensions;
 
 namespace NedMonitor.Http.Tests.Handlers.Fixtures;
 

@@ -1,13 +1,13 @@
 using FluentAssertions;
-using NedMonitor.Http.Tests.Handlers.Fixtures;
+using NedMonitor.Common.Tests;
 using NedMonitor.Core;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Http.Handlers;
+using NedMonitor.Http.Tests.Handlers.Fixtures;
 using System.Net;
 using System.Net.Http.Headers;
 using Xunit.Abstractions;
-using Zypher.Http.Extensions;
-using NedMonitor.Common.Tests;
 
 namespace NedMonitor.Http.Tests.Handlers;
 

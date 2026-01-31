@@ -135,11 +135,9 @@ public sealed class NedMonitorHttpServiceTestsFixture
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         var logger = new Mock<ILogger<NedMonitorHttpService>>();
-        var notification = new Mock<Zypher.Notifications.Interfaces.INotificationHandler>();
 
         var service = new NedMonitorHttpService(
             client,
-            notification.Object,
             logger.Object,
             Options.Create(settings));
 
