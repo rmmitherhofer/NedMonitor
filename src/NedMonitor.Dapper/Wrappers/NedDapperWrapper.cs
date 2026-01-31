@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Logging;
 using NedMonitor.Dapper.Interceptors;
 using System.Data;
-using Zypher.Logs.Extensions;
 
 namespace NedMonitor.Dapper.Wrappers;
+
 internal class NedDapperWrapper : INedDapperWrapper
 {
     private readonly ILogger<NedDapperWrapper> _logger;
@@ -248,7 +248,7 @@ internal class NedDapperWrapper : INedDapperWrapper
     #endregion
 
     #region private
-    private void LogUnmonitored() => _logger.LogWarn("Query not monitored by NedMonitor (connection is not CountingDbConnection)");
+    private void LogUnmonitored() => _logger.LogWarning("Query not monitored by NedMonitor (connection is not CountingDbConnection)");
 
     private T UseConn<T>(IDbConnection conn, Func<CountingDbConnection, T> useCounting, Func<T> useDapper)
     {

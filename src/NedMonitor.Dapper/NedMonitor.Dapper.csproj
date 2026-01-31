@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -9,9 +9,9 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.Dapper</PackageId>
-		<Version>1.0.7</Version>
+		<Version>2.0.0</Version>
 		<Authors>Renato Mitherhofer</Authors>
-		
+
 		<Title>NedMonitor Dapper Interceptors</Title>
 		<Description>Dapper interceptors for monitoring, logging, and telemetry of database queries in NedMonitor.</Description>
 		<PackageTags>dapper;nedmonitor;monitoring;logging;interceptors;telemetry;database;performance</PackageTags>
@@ -28,7 +28,7 @@
 
 		<PackageIcon>assets/icon.png</PackageIcon>
 		<IncludePackageIcon>true</IncludePackageIcon>
-		
+
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
@@ -41,8 +41,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
-		<PackageReference Include="NedMonitor.Core" Version="1.1.11" />
+		<PackageReference Include="NedMonitor.Core" Version="2.0.0" />
 	</ItemGroup>
+
 
 	<ItemGroup>
 		<None Include="assets/icon.png" Pack="true" PackagePath="assets/" />

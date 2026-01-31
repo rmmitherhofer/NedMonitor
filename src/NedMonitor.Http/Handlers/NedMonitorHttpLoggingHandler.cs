@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NedMonitor.Core;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
-using Zypher.Http.Extensions;
 
 namespace NedMonitor.Http.Handlers;
 
