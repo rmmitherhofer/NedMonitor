@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Models;
-using System.Data;
-using System.Data.Common;
 
 namespace NedMonitor.Core.Helpers;
 

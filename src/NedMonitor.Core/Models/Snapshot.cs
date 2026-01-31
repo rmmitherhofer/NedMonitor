@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NedMonitor.Core.Adapters;
+using NedMonitor.Core.Extensions;
 using System.Diagnostics;
-using Zypher.Extensions.Core;
-using Zypher.Json;
-using Zypher.Notifications.Messages;
-using Zypher.User.Extensions;
+using System.Text.Json;
 
 namespace NedMonitor.Core.Models;
 
