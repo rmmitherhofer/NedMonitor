@@ -3,7 +3,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Common.Tests.FakerFactory.Models;
 
-public static class ExceptionInfoFaker
+internal static class ExceptionInfoFaker
 {
     public static IEnumerable<ExceptionInfo> CreateMany(
         int count,

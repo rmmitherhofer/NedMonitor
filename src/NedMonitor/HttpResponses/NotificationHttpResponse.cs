@@ -6,7 +6,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a notification message returned by the API, typically used for logging or audit purposes.
 /// </summary>
-public class NotificationHttpResponse : MessageHttpResponse
+internal class NotificationHttpResponse : MessageHttpResponse
 {
     /// <summary>
     /// Gets or sets the unique identifier of the notification.

@@ -1,6 +1,6 @@
 ﻿namespace NedMonitor.Dapper.Cache;
 
-public static class OrmVersionCache
+internal static class OrmVersionCache
 {
     private static readonly string DapperVersion;
 

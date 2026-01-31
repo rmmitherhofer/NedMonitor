@@ -31,7 +31,7 @@ public sealed class NedMonitorHttpServiceTestsFixture
             }
         };
 
-    public LogContextHttpRequest CreateLog(
+    internal LogContextHttpRequest CreateLog(
         string correlationId = "corr-id",
         string? clientId = "client-id",
         string? ipAddress = "127.0.0.1",
@@ -114,7 +114,7 @@ public sealed class NedMonitorHttpServiceTestsFixture
         };
     }
 
-    public (NedMonitorHttpService Service, TestHttpMessageHandler Handler) CreateService(
+    internal (NedMonitorHttpService Service, TestHttpMessageHandler Handler) CreateService(
         NedMonitorSettings settings,
         Func<HttpRequestMessage, HttpResponseMessage>? responseFactory = null)
     {

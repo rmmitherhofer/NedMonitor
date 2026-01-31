@@ -6,7 +6,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a standard 404 Not Found API response with optional detail information.
 /// </summary>
-public class NotFoundHttpResponse
+internal class NotFoundHttpResponse
 {
     /// <summary>
     /// Gets the HTTP status code representing the response.

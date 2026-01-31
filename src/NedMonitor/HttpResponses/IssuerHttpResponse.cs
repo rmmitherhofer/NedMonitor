@@ -5,7 +5,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a detailed response segment issued by the API for a specific category of result, such as errors or validation issues.
 /// </summary>
-public class IssuerHttpResponse
+internal class IssuerHttpResponse
 {
     /// <summary>
     /// Gets the type of issue returned by the API (e.g., validation, error, not found).

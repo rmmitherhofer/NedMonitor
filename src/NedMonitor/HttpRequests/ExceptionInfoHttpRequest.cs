@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents detailed information about an exception.
 /// </summary>
-public class ExceptionInfoHttpRequest
+internal class ExceptionInfoHttpRequest
 {
     /// <summary>
     /// The type or class name of the exception.

@@ -7,7 +7,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents the full context of a request log, including environment, request, response, diagnostics, and exceptions.
 /// </summary>
-public class LogContextHttpRequest
+internal class LogContextHttpRequest
 {
     /// <summary>
     /// Gets or sets the timestamp indicating when the operation started.

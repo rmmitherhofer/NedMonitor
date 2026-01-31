@@ -3,7 +3,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Core.Helpers;
 
-public static class QueryLogHelper
+internal static class QueryLogHelper
 {
     public static void AddQueryLog(HttpContext context, DbQueryEntry entry)
     {

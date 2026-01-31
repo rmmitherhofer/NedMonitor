@@ -9,7 +9,7 @@ namespace NedMonitor.Middleware;
 /// Middleware that captures the HTTP response body for logging purposes,
 /// storing it in the current context if its size is within the configured limit.
 /// </summary>
-public class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMonitorSettings> options)
+internal class CaptureResponseBodyMiddleware(RequestDelegate next, IOptions<NedMonitorSettings> options)
 {
     /// <summary>
     /// Middleware name identifier.

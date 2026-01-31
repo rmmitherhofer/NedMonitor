@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents a single query execution log entry.
 /// </summary>
-public class DbQueryEntryHttpRequest
+internal class DbQueryEntryHttpRequest
 {
     /// <summary>
     /// The raw SQL command text executed.

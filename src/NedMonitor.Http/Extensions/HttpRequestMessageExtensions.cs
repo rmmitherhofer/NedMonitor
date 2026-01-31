@@ -1,9 +1,9 @@
-﻿namespace NedMonitor.Core.Extensions;
+﻿namespace NedMonitor.Http.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="HttpRequestMessage"/> to simplify header manipulation,
 /// </summary>
-public static class HttpRequestMessageExtensions
+internal static class HttpRequestMessageExtensions
 {
     /// <summary>
     /// The header key used to store the original request template.

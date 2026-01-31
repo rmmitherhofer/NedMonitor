@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// Represents information about the current runtime environment,
 /// including machine name, environment name, application version, and thread ID.
 /// </summary>
-public class EnvironmentInfoHttpRequest
+internal class EnvironmentInfoHttpRequest
 {
     /// <summary>
     /// The name of the machine where the application is running.

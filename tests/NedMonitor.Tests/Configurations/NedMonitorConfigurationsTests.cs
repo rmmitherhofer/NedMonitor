@@ -148,7 +148,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             sensitiveKeys: ["token", "secret"]);
 
         //When
-        services.AddOptions(configuration);
+        services.AddNedMonitor(configuration);
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
@@ -176,7 +176,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             sensitiveKeys: ["Token", "token"]);
 
         //When
-        services.AddOptions(configuration);
+        services.AddNedMonitor(configuration);
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 

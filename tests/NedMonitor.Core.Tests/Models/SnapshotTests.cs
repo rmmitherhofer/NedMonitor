@@ -6,7 +6,6 @@ using Microsoft.Extensions.Primitives;
 using NedMonitor.Common.Tests;
 using NedMonitor.Common.Tests.FakerFactory;
 using NedMonitor.Core.Models;
-using NedMonitor.HttpResponses;
 using System.Text;
 using Xunit.Abstractions;
 

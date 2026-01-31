@@ -3,7 +3,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Common.Tests.FakerFactory.Models;
 
-public static class HttpRequestLogContextFaker
+internal static class HttpRequestLogContextFaker
 {
     public static IEnumerable<HttpRequestLogContext> CreateMany(
         int count,

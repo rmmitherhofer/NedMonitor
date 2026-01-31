@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents a notification log entry with details such as level, key, value, and timestamp.
 /// </summary>
-public class NotificationInfoHttpRequest
+internal class NotificationInfoHttpRequest
 {
     /// <summary>
     /// Unique identifier of the notification.

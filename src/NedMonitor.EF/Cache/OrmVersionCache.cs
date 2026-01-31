@@ -4,7 +4,7 @@
 /// Provides a cached reference to the Entity Framework Core version being used at runtime.
 /// This is useful for logging or diagnostic purposes without repeatedly accessing reflection.
 /// </summary>
-public static class OrmVersionCache
+internal static class OrmVersionCache
 {
     private static readonly string EfCoreVersion;
 

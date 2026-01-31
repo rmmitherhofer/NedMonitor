@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Text.Json;
 
-namespace NedMonitor.Core.Extensions;
+namespace NedMonitor.Extensions;
 
-public static class HttpResponseMessageExtensions
+internal static class HttpResponseMessageExtensions
 {
     /// <summary>
     /// Reads the HTTP response content as a JSON string and deserializes it into the specified type.

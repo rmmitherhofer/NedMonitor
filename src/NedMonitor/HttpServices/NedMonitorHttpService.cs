@@ -2,13 +2,13 @@
 using Microsoft.Extensions.Options;
 using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Settings;
+using NedMonitor.Extensions;
 using NedMonitor.HttpRequests;
 using NedMonitor.HttpResponses;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 
 namespace NedMonitor.HttpServices;
 
@@ -16,7 +16,7 @@ namespace NedMonitor.HttpServices;
 /// HTTP service responsible for sending structured log data to the NedMonitor logging API endpoint.
 /// Handles serialization, header injection, error parsing, and public logging.
 /// </summary>
-public class NedMonitorHttpService : INedMonitorHttpService
+internal class NedMonitorHttpService : INedMonitorHttpService
 {
     /// <summary>
     /// HTTP client instance used for sending requests.

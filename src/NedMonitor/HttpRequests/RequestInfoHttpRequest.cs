@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents detailed information about an HTTP request.
 /// </summary>
-public class RequestInfoHttpRequest
+internal class RequestInfoHttpRequest
 {
     /// <summary>
     /// The unique identifier for the request.

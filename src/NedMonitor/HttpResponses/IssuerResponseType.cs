@@ -5,7 +5,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Defines the types of issues that can be returned by the API in a structured response.
 /// </summary>
-public enum IssuerResponseType
+internal enum IssuerResponseType
 {
     /// <summary>
     /// Indicates that the requested resource was not found.

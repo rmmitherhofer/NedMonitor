@@ -5,7 +5,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a response that contains validation error notifications.
 /// </summary>
-public class ValidationHttpResponse
+internal class ValidationHttpResponse
 {
     /// <summary>
     /// Gets the list of validation notifications returned by the API.

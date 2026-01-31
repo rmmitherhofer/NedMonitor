@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Configuration settings related to HTTP request and response logging.
 /// </summary>
-public class HttpLoggingSettingsHttpRequest
+internal class HttpLoggingSettingsHttpRequest
 {
     /// <summary>
     /// Indicates whether the request and response payload should be written to the console output.

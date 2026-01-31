@@ -17,18 +17,11 @@ namespace NedMonitor.EF.Interceptors;
 /// Captures execution metadata such as SQL command, parameters, duration, and exception messages during EF Core operations.
 /// Stores query data in the current HTTP context for further analysis or remote transmission.
 /// </summary>
-public sealed class EfQueryCounter : DbCommandInterceptor
+internal sealed class EfQueryCounter(IQueryCounter counter, IHttpContextAccessor httpContextAccessor, IOptions<NedMonitorSettings> options) : DbCommandInterceptor
 {
-    private readonly EfInterceptorSettings _efSettings;
-    private readonly IQueryCounter _counter;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public EfQueryCounter(IQueryCounter counter, IHttpContextAccessor httpContextAccessor, IOptions<NedMonitorSettings> options)
-    {
-        _counter = counter;
-        _httpContextAccessor = httpContextAccessor;
-        _efSettings = options.Value.DataInterceptors.EF;
-    }
+    private readonly EfInterceptorSettings _efSettings = options.Value.DataInterceptors.EF;
+    private readonly IQueryCounter _counter = counter;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     /// <summary>
     /// Increments the internal query counter for the current HTTP request.

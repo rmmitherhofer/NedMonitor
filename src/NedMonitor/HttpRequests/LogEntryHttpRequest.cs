@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents a single log entry with detailed information.
 /// </summary>
-public class LogEntryHttpRequest
+internal class LogEntryHttpRequest
 {
     /// <summary>
     /// Category or source of the log entry.

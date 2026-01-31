@@ -5,7 +5,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents the base class for structured API messages that belong to a specific aggregate context.
 /// </summary>
-public abstract class MessageHttpResponse
+internal abstract class MessageHttpResponse
 {
     /// <summary>
     /// Gets or sets the type of the message, typically used to classify the event or action.

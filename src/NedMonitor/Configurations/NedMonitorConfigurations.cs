@@ -49,7 +49,7 @@ public static class NedMonitorConfigurations
     /// <param name="services">The service collection to add options to.</param>
     /// <param name="configuration">The application configuration instance.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
@@ -58,7 +58,6 @@ public static class NedMonitorConfigurations
             .AddOptions<NedMonitorSettings>()
             .Bind(configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE))
             .ValidateOnStart();
-
 
         services.TryAddSingleton<IValidateOptions<NedMonitorSettings>, NedMonitorSettingsValidation>();
 
@@ -165,7 +164,6 @@ public static class NedMonitorConfigurations
     /// <param name="app">The application builder.</param>
     /// <returns>The updated application builder.</returns>
     /// <exception cref="ArgumentNullException">Thrown if the application builder is null.</exception>
-
     public static IApplicationBuilder UseNedMonitorMiddleware(this IApplicationBuilder app)
     {
         ArgumentNullException.ThrowIfNull(app, nameof(IApplicationBuilder));

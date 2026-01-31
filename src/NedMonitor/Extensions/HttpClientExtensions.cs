@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 
-namespace NedMonitor.Core.Extensions;
+namespace NedMonitor.Extensions;
 
 /// <summary>
 /// Extension methods for HttpClient to simplify header management and logging,
 /// leveraging the current HTTP context via IHttpContextAccessor.
 /// </summary>
-public static class HttpClientExtensions
+internal static class HttpClientExtensions
 {
     /// <summary>
     /// Adds a header to the HttpClient default request headers if it does not already exist.

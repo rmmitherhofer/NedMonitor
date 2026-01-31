@@ -17,7 +17,7 @@ namespace NedMonitor.Applications;
 /// <param name="httpService">The HTTP service to send log data to NedMonitor.</param>
 /// <param name="options">Configuration options for NedMonitor.</param>
 /// <param name="builder">Builder used to construct the log context.</param>
-public class NedMonitorApplication(
+internal class NedMonitorApplication(
     INedMonitorHttpService httpService,
     IOptions<NedMonitorSettings> options,
     ILogContextBuilder builder) : INedMonitorApplication

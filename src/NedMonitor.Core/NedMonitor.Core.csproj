@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor.Core</PackageId>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<Authors>Renato Mitherhofer</Authors>
 
 		<Title>NedMonitor.Core - Centralized Monitoring Library</Title>

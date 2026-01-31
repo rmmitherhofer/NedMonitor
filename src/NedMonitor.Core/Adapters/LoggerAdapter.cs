@@ -11,7 +11,7 @@ namespace NedMonitor.Core.Adapters;
 /// <summary>
 /// Custom logger that stores log entries per HTTP request context.
 /// </summary>
-public class LoggerAdapter : ILogger
+internal class LoggerAdapter : ILogger
 {
     private readonly string _category;
     private readonly FormatterOptions _options;

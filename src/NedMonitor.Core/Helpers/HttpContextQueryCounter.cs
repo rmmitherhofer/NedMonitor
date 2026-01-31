@@ -3,7 +3,7 @@ using NedMonitor.Core.Interfaces;
 
 namespace NedMonitor.Core.Helpers;
 
-public class HttpContextQueryCounter : IQueryCounter
+internal class HttpContextQueryCounter : IQueryCounter
 {
     private readonly IHttpContextAccessor _accessor;
 

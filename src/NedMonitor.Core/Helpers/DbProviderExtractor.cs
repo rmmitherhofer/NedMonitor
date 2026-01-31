@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace NedMonitor.Core.Helpers;
 
-public static class DbProviderExtractor
+internal static class DbProviderExtractor
 {
     /// <summary>
     /// Gets the provider name from a generic <see cref="IDbConnection"/> instance.

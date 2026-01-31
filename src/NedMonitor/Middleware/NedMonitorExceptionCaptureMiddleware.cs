@@ -6,16 +6,10 @@ using NedMonitor.Core.Settings;
 
 namespace NedMonitor.Middleware;
 
-public class NedMonitorExceptionCaptureMiddleware
+internal class NedMonitorExceptionCaptureMiddleware(RequestDelegate next, IOptions<NedMonitorSettings> settings)
 {
-    private readonly RequestDelegate _next;
-    private readonly NedMonitorSettings _settings;
-
-    public NedMonitorExceptionCaptureMiddleware(RequestDelegate next, IOptions<NedMonitorSettings> settings)
-    {
-        _next = next;
-        _settings = settings.Value;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly NedMonitorSettings _settings = settings.Value;
 
     public async Task Invoke(HttpContext context)
     {

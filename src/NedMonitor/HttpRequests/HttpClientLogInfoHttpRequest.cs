@@ -7,7 +7,7 @@ namespace NedMonitor.HttpRequests;
 /// Represents detailed information about an HTTP request and response made through an HTTP client,
 /// including headers, bodies, status code, timing, and exceptions (if any).
 /// </summary>
-public class HttpClientLogInfoHttpRequest
+internal class HttpClientLogInfoHttpRequest
 {
     /// <summary>
     /// The timestamp when the HTTP request started.

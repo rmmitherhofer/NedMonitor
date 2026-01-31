@@ -9,24 +9,19 @@ namespace NedMonitor.Middleware;
 /// Middleware that measures request execution time and triggers NedMonitor notification
 /// after the request is completed, regardless of success or exception.
 /// </summary>
-public class NedMonitorMiddleware
+/// <remarks>
+/// Initializes a new instance of the <see cref="NedMonitorMiddleware"/> class.
+/// </remarks>
+/// <param name="next">The next middleware in the pipeline.</param>
+internal class NedMonitorMiddleware(RequestDelegate next)
 {
     /// <summary>
     /// Middleware name identifier.
     /// </summary>
     public const string Name = nameof(NedMonitorMiddleware);
 
-    private readonly RequestDelegate _next;
+    private readonly RequestDelegate _next = next;
     private Stopwatch _diagnostic;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NedMonitorMiddleware"/> class.
-    /// </summary>
-    /// <param name="next">The next middleware in the pipeline.</param>
-    public NedMonitorMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
 
     /// <summary>
     /// Intercepts the HTTP request, measures its execution time, and sends data to NedMonitor.
@@ -35,15 +30,13 @@ public class NedMonitorMiddleware
     /// <param name="context">The current HTTP context.</param>
     public async Task InvokeAsync(HttpContext context, INedMonitorQueue queue)
     {
+        _diagnostic = new();
         DateTime startAt = DateTime.Now;
         try
         {
-            _diagnostic = new();
             _diagnostic.Start();
 
             await _next(context);
-
-            _diagnostic.Stop();
         }
         catch (Exception ex)
         {
@@ -51,6 +44,7 @@ public class NedMonitorMiddleware
         }
         finally
         {
+            _diagnostic.Stop();
             queue.Enqueue(await new Snapshot().CaptureAsync(context, _diagnostic.Elapsed.TotalMilliseconds, startAt, DateTime.Now));
         }
     }

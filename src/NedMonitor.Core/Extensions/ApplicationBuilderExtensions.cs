@@ -5,7 +5,7 @@ namespace NedMonitor.Core.Extensions;
 /// <summary>
 /// Provides extension methods for <see cref="IApplicationBuilder"/>.
 /// </summary>
-public static class ApplicationBuilderExtensions
+internal static class ApplicationBuilderExtensions
 {
     /// <summary>
     /// Adds the specified middleware to the application's request pipeline only if it hasn't been added yet.

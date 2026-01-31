@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace NedMonitor.Core.Models;
 
-public class Snapshot
+internal class Snapshot
 {
     #region Request
     /// <summary>

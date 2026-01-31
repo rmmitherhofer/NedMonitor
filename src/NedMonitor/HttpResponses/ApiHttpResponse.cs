@@ -6,7 +6,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a standard API response structure used for error, validation, and not found results.
 /// </summary>
-public class ApiHttpResponse
+internal class ApiHttpResponse
 {
     /// <summary>
     /// Gets the HTTP status code associated with the response.

@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// Configuration settings for database query interceptors used by NedMonitor.
 /// Contains settings for both Entity Framework Core and Dapper interceptors.
 /// </summary>
-public class DataInterceptorsSettingsHttpRequest
+internal class DataInterceptorsSettingsHttpRequest
 {
     /// <summary>
     /// Settings for the Entity Framework Core interceptor.

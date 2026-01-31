@@ -5,7 +5,7 @@ namespace NedMonitor.Core.Models;
 /// <summary>
 /// Represents a domain notification with metadata such as timestamp, log level, and content.
 /// </summary>
-public class Notification
+internal class Notification
 {
     /// <summary>
     /// Type of the message.

@@ -6,7 +6,7 @@ namespace NedMonitor.HttpResponses;
 /// <summary>
 /// Represents a standardized structure for returning error details from the API.
 /// </summary>
-public class ErrorHttpResponse
+internal class ErrorHttpResponse
 {
     /// <summary>
     /// Gets the HTTP status code associated with the error.
