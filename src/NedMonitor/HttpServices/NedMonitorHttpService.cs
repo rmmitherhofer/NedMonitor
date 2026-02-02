@@ -92,11 +92,11 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
     /// including correlation ID, status, issue types, and diagnostic details.
     /// </summary>
     /// <param name="response">The HTTP response object containing an error payload.</param>
-    /// <exception cref="CustomHttpRequestException">Thrown when response deserialization fails.</exception>
+    /// <exception cref="HttpRequestException">Thrown when response deserialization fails.</exception>
     private async Task Print(HttpResponseMessage response)
     {
         StringBuilder sb = new();
-        ApiHttpResponse apiResponse = null;
+        ApiHttpResponse? apiResponse = null;
 
         try
         {
@@ -113,6 +113,12 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
         }
 
         sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|StatusCode:{(int)response.StatusCode} - {response.StatusCode}");
+
+        if (apiResponse?.Issues == null || !apiResponse.Issues.Any())
+        {
+            _logger.LogError(sb.ToString() + "|No structured issues payload.");
+            return;
+        }
 
         foreach (var issue in apiResponse.Issues)
         {
