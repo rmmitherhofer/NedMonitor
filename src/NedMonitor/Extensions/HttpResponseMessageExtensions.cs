@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace NedMonitor.Extensions;
 
@@ -24,40 +23,8 @@ internal static class HttpResponseMessageExtensions
     }
 
     /// <summary>
-    /// Determines if the HTTP response contains error status codes and optionally throws a custom exception.
-    /// </summary>
-    /// <param name="response">The HttpResponseMessage instance.</param>
-    /// <param name="throwException">Indicates whether to throw an exception for certain status codes.</param>
-    /// <returns>True if the response has errors; otherwise, false.</returns>
-    /// <exception cref="HttpRequestException">Thrown when the status code is Unauthorized or publicServerError and throwException is true.</exception>
-    public static bool HasErrors(this HttpResponseMessage response, bool throwException = true)
-    {
-        ArgumentNullException.ThrowIfNull(response, nameof(HttpResponseMessage));
-
-        var statusCode = response.StatusCode;
-
-        if (statusCode is HttpStatusCode.BadRequest or HttpStatusCode.Forbidden or HttpStatusCode.BadGateway) return true;
-
-        if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.InternalServerError)
-        {
-            if (throwException)
-            {
-                var method = response.RequestMessage?.Method?.Method ?? "UNKNOWN";
-                var uri = response.RequestMessage?.RequestUri?.ToString() ?? "UNKNOWN";
-
-                throw new HttpRequestException($"{method} - {uri} - {(int)statusCode} - {statusCode}", null, statusCode);
-            }
-            return true;
-        }
-
-        try
-        {
-            response.EnsureSuccessStatusCode();
-            return false;
-        }
-        catch
-        {
-            return true;
-        }
-    }
+    /// Determines whether the HTTP response represents a non-successful status code.
+    /// </summary>    
+    public static bool HasErrors(this HttpResponseMessage response)
+        => !response.IsSuccessStatusCode;
 }

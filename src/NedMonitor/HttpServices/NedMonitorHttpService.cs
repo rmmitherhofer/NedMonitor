@@ -78,10 +78,6 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             if (response.HasErrors())
                 await Print(response);
         }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError($"{log.CorrelationId}|" + ex.Message);
-        }
         catch (Exception ex)
         {
             _logger.LogCritical($"{log.CorrelationId}|" + ex.Message);
@@ -96,7 +92,7 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
     private async Task Print(HttpResponseMessage response)
     {
         StringBuilder sb = new();
-        ApiHttpResponse? apiResponse = null;
+        ApiHttpResponse? apiResponse;
 
         try
         {
@@ -107,7 +103,7 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
         }
         catch (Exception)
         {
-            throw new HttpRequestException($"{response.RequestMessage.Method} - {response.RequestMessage.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}", 
+            throw new HttpRequestException($"{response.RequestMessage?.Method} - {response.RequestMessage?.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}", 
                 null, 
                 response.StatusCode);
         }
@@ -133,7 +129,7 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             foreach (var detail in issue.Details)
                 sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|Level:{detail.LogLevel} - Key:{detail.Key} - Value:{detail.Value}");
 
-            switch (apiResponse.Issues.FirstOrDefault().Type)
+            switch (apiResponse.Issues.FirstOrDefault()?.Type)
             {
                 case IssuerResponseType.NotFound:
                 case IssuerResponseType.Validation:
