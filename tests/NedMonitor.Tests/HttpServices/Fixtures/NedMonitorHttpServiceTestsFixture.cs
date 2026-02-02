@@ -7,7 +7,6 @@ using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
 using NedMonitor.HttpServices;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace NedMonitor.Tests.HttpServices.Fixtures;
@@ -24,10 +23,7 @@ public sealed class NedMonitorHttpServiceTestsFixture
             RemoteService = new RemoteServiceSettings
             {
                 BaseAddress = "https://example.local/",
-                Endpoints = new NedMonitorEndpointsSettings
-                {
-                    NotifyLogContext = "/logs"
-                }
+                Endpoint = "/logs"
             }
         };
 

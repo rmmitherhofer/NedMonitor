@@ -22,8 +22,8 @@ public class NedMonitorSettingsValidation : IValidateOptions<NedMonitorSettings>
         if (string.IsNullOrWhiteSpace(settings.RemoteService.BaseAddress))
             return ValidateOptionsResult.Fail("NedMonitor: RemoteService.BaseAddress is required.");
 
-        if (settings.RemoteService.Endpoints is null || string.IsNullOrWhiteSpace(settings.RemoteService.Endpoints.NotifyLogContext))
-            return ValidateOptionsResult.Fail("NedMonitor: RemoteService.Endpoints.NotifyLogContext is required.");
+        if (string.IsNullOrWhiteSpace(settings.RemoteService.Endpoint))
+            return ValidateOptionsResult.Fail("NedMonitor: RemoteService.Endpoint is required.");
 
         return ValidateOptionsResult.Success;
     }

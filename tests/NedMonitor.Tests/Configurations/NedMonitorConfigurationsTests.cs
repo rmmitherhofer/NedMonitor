@@ -201,7 +201,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:ExecutionMode:EnableMonitorLogs"] = enableMonitorLogs.ToString(),
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:ExecutionMode:EnableMonitorDbQueries"] = enableMonitorDbQueries.ToString(),
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:BaseAddress"] = "https://example.com/",
-            [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:Endpoints:NotifyLogContext"] = "/logs"
+            [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:Endpoint"] = "/logs"
         };
 
         if (sensitiveKeys is not null)

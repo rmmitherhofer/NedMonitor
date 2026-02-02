@@ -13,10 +13,7 @@ public sealed class NedMonitorSettingsValidationTestsFixture
         RemoteService = new RemoteServiceSettings
         {
             BaseAddress = "https://example.local",
-            Endpoints = new NedMonitorEndpointsSettings
-            {
-                NotifyLogContext = "/notify"
-            }
+            Endpoint = "/notify"
         }
     };
 

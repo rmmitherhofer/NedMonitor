@@ -16,17 +16,23 @@ namespace NedMonitor.HttpServices;
 /// HTTP service responsible for sending structured log data to the NedMonitor logging API endpoint.
 /// Handles serialization, header injection, error parsing, and public logging.
 /// </summary>
-internal class NedMonitorHttpService : INedMonitorHttpService
+/// <remarks>
+/// Initializes a new instance of the <see cref="NedMonitorHttpService"/> class.
+/// </remarks>
+/// <param name="httpClient">An instance of <see cref="HttpClient"/> configured for outbound requests.</param>
+/// <param name="logger">Typed logger for capturing public service operations.</param>
+/// <param name="options">Injected settings containing the NedMonitor configuration.</param>
+internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHttpService> logger, IOptions<NedMonitorSettings> options) : INedMonitorHttpService
 {
     /// <summary>
     /// HTTP client instance used for sending requests.
     /// </summary>
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient = httpClient;
     /// <summary>
     /// Logger for logging request and response inf
     /// </summary>
-    private readonly ILogger<NedMonitorHttpService> _logger;
-    private readonly NedMonitorSettings _settings;
+    private readonly ILogger<NedMonitorHttpService> _logger = logger;
+    private readonly NedMonitorSettings _settings = options.Value;
     /// <summary>
     /// Stopwatch for measuring request duration.
     /// </summary>
@@ -41,21 +47,6 @@ internal class NedMonitorHttpService : INedMonitorHttpService
     private string _templateUri = string.Empty;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NedMonitorHttpService"/> class.
-    /// </summary>
-    /// <param name="httpClient">An instance of <see cref="HttpClient"/> configured for outbound requests.</param>
-    /// <param name="notification">Domain notification handler for validation and processing errors.</param>
-    /// <param name="logger">Typed logger for capturing public service operations.</param>
-    /// <param name="options">Injected settings containing the NedMonitor configuration.</param>
-
-    public NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHttpService> logger, IOptions<NedMonitorSettings> options)
-    {
-        _httpClient = httpClient;
-        _logger = logger;
-        _settings = options.Value;
-    }
-
-    /// <summary>
     /// Sends a <see cref="LogContextHttpRequest"/> payload to the configured NedMonitor API endpoint.
     /// If enabled, writes the outgoing payload to the console before transmission.
     /// </summary>
@@ -64,18 +55,23 @@ internal class NedMonitorHttpService : INedMonitorHttpService
     {
         try
         {
-            var uri = _settings.RemoteService.Endpoints.NotifyLogContext;
+            var uri = _settings.RemoteService.Endpoint;
 
             var content = JsonExtensions.SerializeContent(log);
 
-            AddDefaultHeaders(log);
+            using var request = new HttpRequestMessage(HttpMethod.Post, uri)
+            {
+                Content = content
+            };
+
+            AddDefaultHeaders(request, log);
 
             if (_settings.HttpLogging.WritePayloadToConsole)
                 EnableLogHeadersAndBody();
 
-            LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), content);
+            LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), request);
 
-            var response = await _httpClient.PostAsync(uri, content);
+            var response = await _httpClient.SendAsync(request);
 
             LogResponse(response);
 
@@ -148,51 +144,51 @@ internal class NedMonitorHttpService : INedMonitorHttpService
     /// into the outbound HTTP request before sending logs to NedMonitor.
     /// </summary>
     /// <param name="log">The current <see cref="LogContextHttpRequest"/> being sent.</param>
-    private void AddDefaultHeaders(LogContextHttpRequest log)
+    private void AddDefaultHeaders(HttpRequestMessage request, LogContextHttpRequest log)
     {
-        AddHeaderIpAddress(log);
-        AddHeaderUserId(log);
-        AddHeaderCorrelationId(log);
-        AddHeaderClientId(log);
-        AddHeaderUserAgent(log);
-        AddHeaderServerHostName();
-        AddHeaderUserAccount(log);
-        AddHeaderUserAccountCode(log);
+        AddHeaderIpAddress(request, log);
+        AddHeaderUserId(request, log);
+        AddHeaderCorrelationId(request, log);
+        AddHeaderClientId(request, log);
+        AddHeaderUserAgent(request, log);
+        AddHeaderServerHostName(request);
+        AddHeaderUserAccount(request, log);
+        AddHeaderUserAccountCode(request, log);
     }
     /// <summary>
     /// Adds the client IP address to the request headers.
     /// </summary>
-    private void AddHeaderIpAddress(LogContextHttpRequest log)
+    private void AddHeaderIpAddress(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var ip = log.Request.IpAddress;
 
         if (!string.IsNullOrEmpty(ip))
-            _httpClient.AddHeader(HttpRequestExtensions.FORWARDED, ip);
+            request.AddOrUpdateHeader(HttpRequestExtensions.FORWARDED, ip);
     }
     /// <summary>
     /// Adds the user ID to the request headers.
     /// </summary>
-    private void AddHeaderUserId(LogContextHttpRequest log)
+    private void AddHeaderUserId(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var userId = log.User.Id;
 
         if (!string.IsNullOrEmpty(userId))
-            _httpClient.AddHeader(HttpRequestExtensions.USER_ID, userId);
+            request.AddOrUpdateHeader(HttpRequestExtensions.USER_ID, userId);
     }
     /// <summary>
     /// Adds the correlation ID to the request headers.
     /// </summary>
-    private void AddHeaderCorrelationId(LogContextHttpRequest log)
+    private void AddHeaderCorrelationId(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var correlationId = log.CorrelationId;
 
         if (!string.IsNullOrEmpty(correlationId))
-            _httpClient.AddHeader(HttpRequestExtensions.CORRELATION_ID, correlationId);
+            request.AddOrUpdateHeader(HttpRequestExtensions.CORRELATION_ID, correlationId);
     }
     /// <summary>
     /// Adds the client ID and application name to the request headers.
     /// </summary>
-    private void AddHeaderClientId(LogContextHttpRequest log)
+    private void AddHeaderClientId(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var clientId = log.Request.ClientId;
 
@@ -202,48 +198,48 @@ internal class NedMonitorHttpService : INedMonitorHttpService
             clientId = Assembly.GetEntryAssembly().GetName().Name;
 
         if (!string.IsNullOrEmpty(clientId))
-            _httpClient.AddHeader(HttpRequestExtensions.CLIENT_ID, clientId);
+            request.AddOrUpdateHeader(HttpRequestExtensions.CLIENT_ID, clientId);
     }
     /// <summary>
     /// Adds the user-agent string to the request headers.
     /// </summary>
-    private void AddHeaderUserAgent(LogContextHttpRequest log)
+    private void AddHeaderUserAgent(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var userAgent = log.Request.UserAgent;
 
         if (!string.IsNullOrEmpty(userAgent))
-            _httpClient.AddHeader(HttpRequestExtensions.USER_AGENT, userAgent);
+            request.AddOrUpdateHeader(HttpRequestExtensions.USER_AGENT, userAgent);
     }
     /// <summary>
     /// Adds the current server or pod host name to the request headers.
     /// </summary>
-    private void AddHeaderServerHostName()
+    private void AddHeaderServerHostName(HttpRequestMessage request)
     {
         var podeName = Dns.GetHostName();
 
         if (!string.IsNullOrEmpty(podeName))
-            _httpClient.AddHeader(HttpRequestExtensions.POD_NAME, podeName);
+            request.AddOrUpdateHeader(HttpRequestExtensions.POD_NAME, podeName);
     }
 
     /// <summary>
     /// Adds the user account identifier to the request headers.
     /// </summary>
-    private void AddHeaderUserAccount(LogContextHttpRequest log)
+    private void AddHeaderUserAccount(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var userAccount = log.User.Account;
 
         if (!string.IsNullOrEmpty(userAccount))
-            _httpClient.AddHeader(HttpRequestExtensions.USER_ACCOUNT, userAccount);
+            request.AddOrUpdateHeader(HttpRequestExtensions.USER_ACCOUNT, userAccount);
     }
     /// <summary>
     /// Adds the user account code to the request headers.
     /// </summary>
-    private void AddHeaderUserAccountCode(LogContextHttpRequest log)
+    private void AddHeaderUserAccountCode(HttpRequestMessage request, LogContextHttpRequest log)
     {
         var userAccountCode = log.User.AccountCode;
 
         if (!string.IsNullOrEmpty(userAccountCode))
-            _httpClient.AddHeader(HttpRequestExtensions.USER_ACCOUNT_CODE, userAccountCode);
+            request.AddOrUpdateHeader(HttpRequestExtensions.USER_ACCOUNT_CODE, userAccountCode);
     }
 
     private void EnableLogHeadersAndBody() => IsDetailedLoggingEnabled = true;
@@ -253,7 +249,7 @@ internal class NedMonitorHttpService : INedMonitorHttpService
     /// <summary>
     /// Logs the start of an HTTP request including method, URI, headers, and optional content.
     /// </summary>
-    private void LogRequest(string httpMehod, Uri uri, HttpContent? content = null)
+    private void LogRequest(string httpMehod, Uri uri, HttpRequestMessage? request = null)
     {
         _stopwatch = new();
         _stopwatch.Start();
@@ -262,10 +258,10 @@ internal class NedMonitorHttpService : INedMonitorHttpService
         var contentJson = string.Empty;
         if (IsDetailedLoggingEnabled)
         {
-            headersJson = $"|Headers:{_httpClient.GetHeadersJsonFormat()}";
+            headersJson = $"|Headers:{request?.GetHeadersJsonFormat()}";
 
-            if (content is not null)
-                contentJson = $"|Content:{content.ReadAsStringAsync().Result}";
+            if (request is not null && request.Content is not null)
+                contentJson = $"|Content:{request.Content?.ReadAsStringAsync().Result}";
         }
         _logger.LogInformation($"Start processing HTTP request {httpMehod} {(string.IsNullOrEmpty(_templateUri) ? uri : _httpClient.BaseAddress + _templateUri)}{headersJson}{contentJson}");
     }

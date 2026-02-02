@@ -64,7 +64,7 @@ public class NedMonitorSettings
     public DataInterceptorsSettings DataInterceptors { get; set; } = new();
 
     /// <summary>
-    /// HTTP service-specific settings for NedMonitor (e.g., base address, endpoints).
+    /// HTTP service-specific settings for NedMonitor (e.g., base address, endpoint).
     /// </summary>
     public RemoteServiceSettings RemoteService { get; set; }
 }
