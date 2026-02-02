@@ -20,7 +20,7 @@ internal static class HttpRequestMessageExtensions
         if (request.Headers.Contains(key))
             request.Headers.Remove(key);
 
-        request.Headers.Add(key, value);
+        request.Headers.TryAddWithoutValidation(key, value);
     }
     /// <summary>
     /// Retrieves the first value of a specific header from the HttpRequestMessage.
