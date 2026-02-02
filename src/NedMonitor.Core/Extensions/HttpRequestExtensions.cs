@@ -7,66 +7,66 @@ namespace NedMonitor.Core.Extensions;
 /// <summary>
 /// Provides extension methods for <see cref="HttpRequest"/> to simplify common HTTP request operations.
 /// </summary>
-public static class HttpRequestExtensions
+internal static class HttpRequestExtensions
 {
     /// <summary>X-User-ID header key.</summary>
-    public const string USER_ID = "X-User-ID";
+    internal const string USER_ID = "X-User-ID";
     /// <summary>X-User-Name header key.</summary>
-    public const string USER_NAME = "X-User-Name";
+    internal const string USER_NAME = "X-User-Name";
     /// <summary>X-User-Name header key.</summary>
-    public const string USER_ACCOUNT = "X-User-Account";
+    internal const string USER_ACCOUNT = "X-User-Account";
     /// <summary>X-User-Name-Code header key.</summary>
-    public const string USER_ACCOUNT_CODE = "X-User-Account-Code";
+    internal const string USER_ACCOUNT_CODE = "X-User-Account-Code";
     /// <summary>X-User-Name header key.</summary>
-    public const string USER_DOCUMENT = "X-User-Document";
+    internal const string USER_DOCUMENT = "X-User-Document";
     /// <summary>User-Agent header key.</summary>
-    public const string USER_AGENT = "User-Agent";
+    internal const string USER_AGENT = "User-Agent";
     /// <summary>X-Forwarded-For header key.</summary>
-    public const string FORWARDED = "X-Forwarded-For";
+    internal const string FORWARDED = "X-Forwarded-For";
     /// <summary>X-Requested-With header key.</summary>
-    public const string REQUESTED_WITH = "X-Requested-With";
+    internal const string REQUESTED_WITH = "X-Requested-With";
     /// <summary>X-Request-ID header key.</summary>
-    public const string REQUEST_ID = "X-Request-ID";
+    internal const string REQUEST_ID = "X-Request-ID";
     /// <summary>X-Correlation-ID header key.</summary>
-    public const string CORRELATION_ID = "X-Correlation-ID";
+    internal const string CORRELATION_ID = "X-Correlation-ID";
     /// <summary>X-Client-ID header key.</summary>
-    public const string CLIENT_ID = "X-Client-ID";
+    internal const string CLIENT_ID = "X-Client-ID";
     /// <summary>X-Pod-Name header key.</summary>
-    public const string POD_NAME = "X-Pod-Name";
+    internal const string POD_NAME = "X-Pod-Name";
     private const string LOCAL_HOST_IP = "127.0.0.1";
 
     /// <summary>
     /// Gets the user ID from the request header.
     /// </summary>
-    public static string? GetUserId(this HttpRequest request) => request.GetHeader(USER_ID);
+    internal static string? GetUserId(this HttpRequest request) => request.GetHeader(USER_ID);
 
     /// <summary>
     /// Gets the user name from the request header.
     /// </summary>
-    public static string? GetUserName(this HttpRequest request) => request.GetHeader(USER_NAME);
+    internal static string? GetUserName(this HttpRequest request) => request.GetHeader(USER_NAME);
     /// <summary>
     /// Gets the user account from the request header.
     /// </summary>
-    public static string? GetUserAccount(this HttpRequest request) => request.GetHeader(USER_ACCOUNT);
+    internal static string? GetUserAccount(this HttpRequest request) => request.GetHeader(USER_ACCOUNT);
     /// <summary>
     /// Gets the user account code from the request header.
     /// </summary>
-    public static string? GetUserAccountCode(this HttpRequest request) => request.GetHeader(USER_ACCOUNT_CODE);
+    internal static string? GetUserAccountCode(this HttpRequest request) => request.GetHeader(USER_ACCOUNT_CODE);
     /// <summary>
     /// Gets the user document from the request header.
     /// </summary>
-    public static string? GetUserDocument(this HttpRequest request) => request.GetHeader(USER_DOCUMENT);
+    internal static string? GetUserDocument(this HttpRequest request) => request.GetHeader(USER_DOCUMENT);
 
     /// <summary>
     /// Gets the user agent string from the request header.
     /// </summary>
-    public static string? GetUserAgent(this HttpRequest request) => request.GetHeader(USER_AGENT);
+    internal static string? GetUserAgent(this HttpRequest request) => request.GetHeader(USER_AGENT);
 
     /// <summary>
     /// Gets the IP address of the client making the request, considering forwarded headers.
     /// Defaults to localhost if no IP found.
     /// </summary>
-    public static string GetIpAddress(this HttpRequest request)
+    internal static string GetIpAddress(this HttpRequest request)
     {
         string ipAddress = request.GetHeader(FORWARDED)?.Split(',').FirstOrDefault() ?? string.Empty;
 
@@ -86,7 +86,7 @@ public static class HttpRequestExtensions
     /// <summary>
     /// Gets the request ID header value, creating one if it doesn't exist.
     /// </summary>
-    public static string GetRequestId(this HttpRequest request)
+    internal static string GetRequestId(this HttpRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         request.CreateRequestId();
@@ -96,7 +96,7 @@ public static class HttpRequestExtensions
     /// <summary>
     /// Creates and sets a new request ID header if one does not exist.
     /// </summary>
-    public static void CreateRequestId(this HttpRequest request)
+    internal static void CreateRequestId(this HttpRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (!string.IsNullOrEmpty(request.GetHeader(REQUEST_ID))) return;
@@ -106,7 +106,7 @@ public static class HttpRequestExtensions
     /// <summary>
     /// Gets the correlation ID header value, creating one if it doesn't exist.
     /// </summary>
-    public static string GetCorrelationId(this HttpRequest request)
+    internal static string GetCorrelationId(this HttpRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         request.CreateCorrelationId();
@@ -117,7 +117,7 @@ public static class HttpRequestExtensions
     /// Creates and sets a new correlation ID header if one does not exist,
     /// using the request ID as the correlation ID.
     /// </summary>
-    public static void CreateCorrelationId(this HttpRequest request)
+    internal static void CreateCorrelationId(this HttpRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (!string.IsNullOrEmpty(request.GetHeader(CORRELATION_ID))) return;
@@ -125,22 +125,22 @@ public static class HttpRequestExtensions
     }
 
     /// <summary>Gets the client ID from the request header.</summary>
-    public static string? GetClientId(this HttpRequest request) => request.GetHeader(CLIENT_ID);
+    internal static string? GetClientId(this HttpRequest request) => request.GetHeader(CLIENT_ID);
 
     /// <summary>Gets the content type (without parameters) from the request header.</summary>
-    public static string? GetContentType(this HttpRequest request)
+    internal static string? GetContentType(this HttpRequest request)
         => request.ContentType?.Split(';').FirstOrDefault()?.Trim();
 
     /// <summary>Returns true if the request was made via AJAX.</summary>
-    public static bool IsAjaxRequest(this HttpRequest request)
+    internal static bool IsAjaxRequest(this HttpRequest request)
         => request.GetHeader(REQUESTED_WITH) == "XMLHttpRequest";
 
     /// <summary>Gets the full URL of the request.</summary>
-    public static string GetFullUrl(this HttpRequest request)
+    internal static string GetFullUrl(this HttpRequest request)
         => $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
 
     /// <summary>Adds a header to the request if it does not exist.</summary>
-    public static void AddHeader(this HttpRequest request, string key, string value)
+    internal static void AddHeader(this HttpRequest request, string key, string value)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrEmpty(key);
@@ -148,7 +148,7 @@ public static class HttpRequestExtensions
             request.Headers[key] = value;
     }
     /// <summary>Gets a header value by key if present; otherwise, null.</summary>
-    public static string? GetHeader(this HttpRequest request, string key)
+    internal static string? GetHeader(this HttpRequest request, string key)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrEmpty(key);

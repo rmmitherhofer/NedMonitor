@@ -3,12 +3,12 @@ using NedMonitor.Core.Enums;
 
 namespace NedMonitor.Core.Extensions;
 
-public static class LogAttentionMapper
+internal static class LogAttentionMapper
 {
     /// <summary>
     /// Maps a Microsoft LogLevel to the corresponding attention level.
     /// </summary>
-    public static LogAttentionLevel Map(this LogLevel logLevel) =>
+    internal static LogAttentionLevel Map(this LogLevel logLevel) =>
         logLevel switch
         {
             LogLevel.Trace => LogAttentionLevel.None,

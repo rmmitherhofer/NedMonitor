@@ -8,7 +8,7 @@ namespace NedMonitor.Core.Extensions;
 /// Masks sensitive data fields in objects by replacing values of specified keys with "***REDACTED***".
 /// Works by serializing the object to JSON and recursively masking keys defined in configuration.
 /// </summary>
-public class SensitiveDataMasker
+internal class SensitiveDataMasker
 {
     private readonly HashSet<string> _sensitiveKeys;
     private readonly HashSet<string> _sensitivePatterns;
@@ -20,7 +20,7 @@ public class SensitiveDataMasker
     /// </summary>
     /// <param name="options">Options containing the list of sensitive keys to mask.</param>
 
-    public SensitiveDataMasker(SensitiveDataMaskerSettings options)
+    internal SensitiveDataMasker(SensitiveDataMaskerSettings options)
     {
         _sensitiveKeys = new HashSet<string>(options.SensitiveKeys ?? [], StringComparer.OrdinalIgnoreCase);
         _sensitivePatterns = new HashSet<string>(options.SensitivePatterns ?? [], StringComparer.OrdinalIgnoreCase);
@@ -34,7 +34,7 @@ public class SensitiveDataMasker
     /// </summary>
     /// <param name="input">The object to be masked.</param>
     /// <returns>A new object with sensitive fields masked, or the original object if masking fails.</returns>
-    public object? Mask(object? input)
+    internal object? Mask(object? input)
     {
         if (!_enabled || input == null)
             return input;
@@ -51,7 +51,7 @@ public class SensitiveDataMasker
     }
 
 
-    public string? MaskString(string input)
+    internal string? MaskString(string input)
     {
         if (!_enabled || string.IsNullOrEmpty(input)) return input;
 
@@ -78,7 +78,7 @@ public class SensitiveDataMasker
     /// <summary>
     /// Masks sensitive data in a dictionary of string keys and object values.
     /// </summary>
-    public IDictionary<string, object?>? MaskObjectDictionary(IDictionary<string, object?> input)
+    internal IDictionary<string, object?>? MaskObjectDictionary(IDictionary<string, object?> input)
     {
         if (!_enabled || input == null) return input;
 
@@ -154,7 +154,7 @@ public class SensitiveDataMasker
     /// <summary>
     /// Masks sensitive data in a dictionary of string keys and string values.
     /// </summary>
-    public IDictionary<string, string>? Mask(IDictionary<string, string> data)
+    internal IDictionary<string, string>? Mask(IDictionary<string, string> data)
     {
         if (!_enabled || data is null) return data;
 
@@ -170,7 +170,7 @@ public class SensitiveDataMasker
     /// <summary>
     /// Masks sensitive data in a dictionary of string keys and list of string values.
     /// </summary>
-    public IDictionary<string, List<string>>? Mask(IDictionary<string, List<string>> data)
+    internal IDictionary<string, List<string>>? Mask(IDictionary<string, List<string>> data)
     {
         if (!_enabled || data == null) return data;
 

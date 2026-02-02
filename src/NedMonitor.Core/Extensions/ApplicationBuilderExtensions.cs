@@ -14,7 +14,7 @@ internal static class ApplicationBuilderExtensions
     /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
     /// <returns>The same <see cref="IApplicationBuilder"/> instance for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is null.</exception>
-    public static IApplicationBuilder TryUseMiddleware<TMiddleware>(this IApplicationBuilder app)
+    internal static IApplicationBuilder TryUseMiddleware<TMiddleware>(this IApplicationBuilder app)
     {
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 

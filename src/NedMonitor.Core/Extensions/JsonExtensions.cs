@@ -8,17 +8,17 @@ namespace NedMonitor.Core.Extensions;
 /// <summary>
 /// Utility methods for JSON serialization and deserialization with default configuration.
 /// </summary>
-public static class JsonExtensions
+internal static class JsonExtensions
 {
     /// <summary>
     /// Default content type used for JSON: "application/json".
     /// </summary>
-    public const string CONTENT_TYPE = "application/json";
+    internal const string CONTENT_TYPE = "application/json";
 
     /// <summary>
     /// Default options for JSON serialization.
     /// </summary>
-    public static readonly JsonSerializerOptions SerializeDefaultOptions = new()
+    internal static readonly JsonSerializerOptions SerializeDefaultOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -29,7 +29,7 @@ public static class JsonExtensions
     /// <summary>
     /// Default options for JSON deserialization.
     /// </summary>
-    public static readonly JsonSerializerOptions DeserializeDefaultOptions = new()
+    internal static readonly JsonSerializerOptions DeserializeDefaultOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -47,7 +47,7 @@ public static class JsonExtensions
     /// <param name="data">The object to serialize.</param>
     /// <param name="options">Custom serialization options (optional).</param>
     /// <returns>JSON content as StringContent.</returns>
-    public static StringContent SerializeContent(object data, JsonSerializerOptions? options = null) =>
+    internal static StringContent SerializeContent(object data, JsonSerializerOptions? options = null) =>
         new(Serialize(data, options), Encoding.UTF8, CONTENT_TYPE);
 
     /// <summary>
@@ -56,7 +56,7 @@ public static class JsonExtensions
     /// <param name="data">The object to serialize.</param>
     /// <param name="options">Serialization options (optional).</param>
     /// <returns>JSON string.</returns>
-    public static string Serialize(object data, JsonSerializerOptions? options = null)
+    internal static string Serialize(object data, JsonSerializerOptions? options = null)
     {
         try
         {
@@ -75,7 +75,7 @@ public static class JsonExtensions
     /// <param name="content">The JSON content string.</param>
     /// <param name="options">Deserialization options (optional).</param>
     /// <returns>Deserialized object or null if input is empty.</returns>
-    public static T? Deserialize<T>(string content, JsonSerializerOptions? options = null)
+    internal static T? Deserialize<T>(string content, JsonSerializerOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(content)) return default;
 
@@ -102,9 +102,9 @@ public static class JsonExtensions
     /// If the input is invalid or not parsable, the original string is returned.
     /// </summary>
     /// <param name="rawJsonString">The raw JSON string to format.</param>
-    /// <param name="options">Optional deserialization options for public parsing.</param>
+    /// <param name="options">Optional deserialization options for internal parsing.</param>
     /// <returns>The formatted JSON string if successful; otherwise, the original input.</returns>
-    public static string TryFormatJson(string rawJsonString, JsonSerializerOptions? options = null)
+    internal static string TryFormatJson(string rawJsonString, JsonSerializerOptions? options = null)
     {
         try
         {

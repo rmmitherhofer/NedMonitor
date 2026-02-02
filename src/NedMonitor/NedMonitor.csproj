@@ -9,7 +9,7 @@
 		<IncludeReferencedProjects>true</IncludeReferencedProjects>
 
 		<PackageId>NedMonitor</PackageId>
-		<Version>2.0.2</Version>
+		<Version>2.0.3</Version>
 		<Authors>Renato Mitherhofer</Authors>
 
 		<Title>NedMonitor Core Monitoring Library</Title>
@@ -39,6 +39,6 @@
 		<None Include="assets/icon.png" Pack="true" PackagePath="assets/" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="NedMonitor.Core" Version="2.0.2" />
+		<PackageReference Include="NedMonitor.Core" Version="2.0.3" />
 	</ItemGroup>
 </Project>

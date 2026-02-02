@@ -3,16 +3,10 @@ using NedMonitor.Core.Interfaces;
 
 namespace NedMonitor.Core.Middlewares;
 
-public class QueryCounterResetMiddleware
+internal class QueryCounterResetMiddleware(RequestDelegate next, IQueryCounter counter)
 {
-    private readonly RequestDelegate _next;
-    private readonly IQueryCounter _counter;
-
-    public QueryCounterResetMiddleware(RequestDelegate next, IQueryCounter counter)
-    {
-        _next = next;
-        _counter = counter;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly IQueryCounter _counter = counter;
 
     public async Task InvokeAsync(HttpContext context)
     {

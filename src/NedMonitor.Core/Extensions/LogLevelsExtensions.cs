@@ -27,7 +27,7 @@ internal static class LogLevelsExtensions
     /// <param name="lineNumber">The caller line number, automatically supplied by the compiler.</param>
     /// <param name="memberType">The caller file path or type, automatically supplied by the compiler.</param>
     /// <returns>The enriched <see cref="LogEntry"/> instance.</returns>
-    public static LogEntry Member(this LogEntry entry,
+    internal static LogEntry Member(this LogEntry entry,
             [CallerMemberName] string? memberName = null,
             [CallerLineNumber] int lineNumber = 0,
             [CallerFilePath] string? memberType = null)
