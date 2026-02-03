@@ -6,6 +6,7 @@ using NedMonitor.Extensions;
 using NedMonitor.HttpRequests;
 using NedMonitor.HttpResponses;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -34,17 +35,9 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
     private readonly ILogger<NedMonitorHttpService> _logger = logger;
     private readonly NedMonitorSettings _settings = options.Value;
     /// <summary>
-    /// Stopwatch for measuring request duration.
-    /// </summary>
-    private Stopwatch _stopwatch;
-    /// <summary>
     /// Indicates whether detailed request and response logging (headers and body) is enabled.
     /// </summary>
-    private bool IsDetailedLoggingEnabled = false;
-    /// <summary>
-    /// Stores the URI template used to identify the logical route in logs.
-    /// </summary>
-    private string _templateUri = string.Empty;
+    private bool IsDetailedLoggingEnabled;
 
     /// <summary>
     /// Sends a <see cref="LogContextHttpRequest"/> payload to the configured NedMonitor API endpoint.
@@ -69,18 +62,18 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             if (_settings.HttpLogging.WritePayloadToConsole)
                 EnableLogHeadersAndBody();
 
-            LogRequest(HttpMethod.Post.Method, new Uri(_httpClient.BaseAddress! + uri), request);
-
+            LogRequest(request);
+            var stopwatch = Stopwatch.StartNew();
             var response = await _httpClient.SendAsync(request);
 
-            LogResponse(response);
+            LogResponse(request, response, stopwatch);
 
             if (response.HasErrors())
                 await Print(response);
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"{log.CorrelationId}|" + ex.Message);
+            _logger.LogCritical($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|CRIT|{log.CorrelationId}|[NedMonitor]|" + ex.Message);
         }
     }
     /// <summary>
@@ -103,12 +96,20 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
         }
         catch (Exception)
         {
-            throw new HttpRequestException($"{response.RequestMessage?.Method} - {response.RequestMessage?.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}", 
-                null, 
-                response.StatusCode);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.InternalServerError:
+                case HttpStatusCode.BadGateway:
+                    throw new HttpRequestException($"{response.RequestMessage?.Method} - {response.RequestMessage?.RequestUri} - {(int)response.StatusCode} - {response.StatusCode}",
+                    null,
+                    response.StatusCode);
+                default:
+                    return;
+            }
+
         }
 
-        sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|StatusCode:{(int)response.StatusCode} - {response.StatusCode}");
+        sb.AppendLine($"{apiResponse.CorrelationId}|[NedMonitor]|StatusCode:{(int)response.StatusCode} - {response.StatusCode}");
 
         if (apiResponse?.Issues == null || !apiResponse.Issues.Any())
         {
@@ -118,16 +119,16 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
 
         foreach (var issue in apiResponse.Issues)
         {
-            sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|Type:{issue.DescriptionType}{(string.IsNullOrEmpty(issue.Title) ? string.Empty : $" - Title:{issue.Title}")}");
+            sb.AppendLine($"{apiResponse.CorrelationId}|[NedMonitor]|Type:{issue.DescriptionType}{(string.IsNullOrEmpty(issue.Title) ? string.Empty : $" - Title:{issue.Title}")}");
 
             if (issue.Details?.Any() is not true)
             {
-                sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|No details available.");
+                sb.AppendLine($"{apiResponse.CorrelationId}|[NedMonitor]|No details available.");
                 continue;
             }
 
             foreach (var detail in issue.Details)
-                sb.AppendLine($"[NedMonitor]{apiResponse.CorrelationId}|Level:{detail.LogLevel} - Key:{detail.Key} - Value:{detail.Value}");
+                sb.AppendLine($"{apiResponse.CorrelationId}|[NedMonitor]|Level:{detail.LogLevel} - Key:{detail.Key} - Value:{detail.Value}");
 
             switch (apiResponse.Issues.FirstOrDefault()?.Type)
             {
@@ -141,6 +142,7 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             }
         }
     }
+    #region Headers
     /// <summary>
     /// Injects common headers (such as user ID, IP, client ID, and correlation ID)
     /// into the outbound HTTP request before sending logs to NedMonitor.
@@ -243,39 +245,35 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
         if (!string.IsNullOrEmpty(userAccountCode))
             request.AddOrUpdateHeader(HttpRequestExtensions.USER_ACCOUNT_CODE, userAccountCode);
     }
-
-    private void EnableLogHeadersAndBody() => IsDetailedLoggingEnabled = true;
+    #endregion
 
     #region Logs
-
+    private void EnableLogHeadersAndBody() => IsDetailedLoggingEnabled = true;
     /// <summary>
     /// Logs the start of an HTTP request including method, URI, headers, and optional content.
     /// </summary>
-    private void LogRequest(string httpMehod, Uri uri, HttpRequestMessage? request = null)
+    private void LogRequest(HttpRequestMessage request)
     {
-        _stopwatch = new();
-        _stopwatch.Start();
-
         var headersJson = string.Empty;
         var contentJson = string.Empty;
         if (IsDetailedLoggingEnabled)
         {
-            headersJson = $"|Headers:{request?.GetHeadersJsonFormat()}";
+            headersJson = $"|Headers:{request.GetHeadersJsonFormat()}";
 
-            if (request is not null && request.Content is not null)
+            if (request?.Content is not null)
                 contentJson = $"|Content:{request.Content?.ReadAsStringAsync().Result}";
         }
-        _logger.LogInformation($"Start processing HTTP request {httpMehod} {(string.IsNullOrEmpty(_templateUri) ? uri : _httpClient.BaseAddress + _templateUri)}{headersJson}{contentJson}");
+        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|INFO|{request.GetHeader(HttpRequestExtensions.CORRELATION_ID)}|[NedMonitor]|Start processing HTTP request {request?.Method.Method} {request?.RequestUri!}{headersJson}{contentJson}");
     }
 
     /// <summary>
     /// Logs the end of an HTTP request including method, URI, elapsed time and response status.
     /// </summary>
-    protected void LogResponse(HttpResponseMessage response)
+    private void LogResponse(HttpRequestMessage request, HttpResponseMessage response, Stopwatch stopwatch)
     {
-        _stopwatch.Stop();
+        stopwatch.Stop();
 
-        string message = $"End processing HTTP request {response?.RequestMessage?.Method} {(string.IsNullOrEmpty(_templateUri) ? response?.RequestMessage?.RequestUri : _httpClient.BaseAddress + _templateUri)} after {_stopwatch.GetFormattedTime()} - {(int)response.StatusCode}-{response.StatusCode}";
+        string message = $"{request.GetHeader(HttpRequestExtensions.CORRELATION_ID)}|[NedMonitor]|End processing HTTP request {response?.RequestMessage?.Method} {response?.RequestMessage?.RequestUri} after {stopwatch.GetFormattedTime()} - {(int)response.StatusCode} - {response.StatusCode}";
 
         switch (response.StatusCode)
         {
@@ -289,13 +287,12 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             case HttpStatusCode.MultiStatus:
             case HttpStatusCode.AlreadyReported:
             case HttpStatusCode.IMUsed:
-                _logger.LogInformation(message);
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|INFO|{message}");
                 break;
             case HttpStatusCode.BadRequest:
             case HttpStatusCode.Unauthorized:
             case HttpStatusCode.PaymentRequired:
             case HttpStatusCode.Forbidden:
-            case HttpStatusCode.NotFound:
             case HttpStatusCode.MethodNotAllowed:
             case HttpStatusCode.NotAcceptable:
             case HttpStatusCode.ProxyAuthenticationRequired:
@@ -318,8 +315,9 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             case HttpStatusCode.TooManyRequests:
             case HttpStatusCode.RequestHeaderFieldsTooLarge:
             case HttpStatusCode.UnavailableForLegalReasons:
-                _logger.LogWarning(message);
+                _logger.LogWarning($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|WARN|{message}");
                 break;
+            case HttpStatusCode.NotFound:
             case HttpStatusCode.InternalServerError:
             case HttpStatusCode.NotImplemented:
             case HttpStatusCode.BadGateway:
@@ -331,10 +329,10 @@ internal class NedMonitorHttpService(HttpClient httpClient, ILogger<NedMonitorHt
             case HttpStatusCode.LoopDetected:
             case HttpStatusCode.NotExtended:
             case HttpStatusCode.NetworkAuthenticationRequired:
-                _logger.LogError(message);
+                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|FAIL|{message}");
                 break;
             default:
-                _logger.LogCritical(message);
+                _logger.LogCritical($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", new CultureInfo("pt-BR"))}|CRIT|{message}");
                 break;
         }
     }
