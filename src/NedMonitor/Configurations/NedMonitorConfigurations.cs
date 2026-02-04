@@ -34,6 +34,8 @@ public static class NedMonitorConfigurations
         ArgumentNullException.ThrowIfNull(services, nameof(IServiceCollection));
         ArgumentNullException.ThrowIfNull(configuration, nameof(IConfiguration));
 
+        if(!configuration.NedMonitorIsEnabled()) return services;
+
         services.AddHttpContextAccessor();
 
         services.AddOptions(configuration);
@@ -112,7 +114,7 @@ public static class NedMonitorConfigurations
         var monitorSection = configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE);
         var settings = monitorSection.Get<NedMonitorSettings>();
 
-        if (settings?.ExecutionMode.EnableNedMonitor != true) return services; 
+        if (settings?.ExecutionMode.EnableNedMonitor != true) return services;
 
         if (settings.ExecutionMode.EnableMonitorLogs)
         {
@@ -144,6 +146,8 @@ public static class NedMonitorConfigurations
     {
         ArgumentNullException.ThrowIfNull(app, nameof(IApplicationBuilder));
 
+        if (!app.NedMonitorIsEnabled()) return app;
+
         var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
         if (!settings.ExecutionMode.EnableNedMonitor) return app;
@@ -168,6 +172,8 @@ public static class NedMonitorConfigurations
     {
         ArgumentNullException.ThrowIfNull(app, nameof(IApplicationBuilder));
 
+        if (!app.NedMonitorIsEnabled()) return app;
+
         var settings = app.ApplicationServices.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
         if (!settings.ExecutionMode.EnableNedMonitor || !settings.ExecutionMode.EnableMonitorExceptions) return app;
@@ -177,4 +183,22 @@ public static class NedMonitorConfigurations
         return app;
     }
 
+    private static bool NedMonitorIsEnabled(this IApplicationBuilder app)
+    {
+        var monitorSection = app.ApplicationServices
+            .GetRequiredService<IConfiguration>()
+            .GetSection(NedMonitorSettings.NEDMONITOR_NODE);
+
+        var settingsFromSection = monitorSection.Get<NedMonitorSettings>();
+
+        return settingsFromSection?.ExecutionMode?.EnableNedMonitor == true;
+    }
+
+    private static bool NedMonitorIsEnabled(this IConfiguration configuration)
+    {
+        var monitorSection = configuration.GetSection(NedMonitorSettings.NEDMONITOR_NODE);
+        var settings = monitorSection.Get<NedMonitorSettings>();
+
+        return settings?.ExecutionMode.EnableNedMonitor == true;
+    }
 }
