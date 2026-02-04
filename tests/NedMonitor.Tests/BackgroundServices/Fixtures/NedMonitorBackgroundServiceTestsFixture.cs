@@ -11,7 +11,7 @@ namespace NedMonitor.Tests.BackgroundServices.Fixtures;
 
 public sealed class NedMonitorBackgroundServiceTestsFixture
 {
-    public (ServiceProvider Provider, FakeNedMonitorQueue Queue, Mock<INedMonitorApplication> AppMock) CreateServices()
+    internal (ServiceProvider Provider, FakeNedMonitorQueue Queue, Mock<INedMonitorApplication> AppMock) CreateServices()
     {
         var services = new ServiceCollection();
         var queue = new FakeNedMonitorQueue();
@@ -23,7 +23,7 @@ public sealed class NedMonitorBackgroundServiceTestsFixture
         return (services.BuildServiceProvider(), queue, appMock);
     }
 
-    public sealed class FakeNedMonitorQueue : INedMonitorQueue
+    internal sealed class FakeNedMonitorQueue : INedMonitorQueue
     {
         private readonly Channel<Snapshot> _channel = Channel.CreateUnbounded<Snapshot>();
 
@@ -36,7 +36,7 @@ public sealed class NedMonitorBackgroundServiceTestsFixture
             => _channel.Writer.TryComplete();
     }
 
-    public sealed class TestableNedMonitorBackgroundService(
+    internal sealed class TestableNedMonitorBackgroundService(
         IServiceScopeFactory scopeFactory,
         ILogger<NedMonitorBackgroundService> logger)
         : NedMonitorBackgroundService(scopeFactory, logger)

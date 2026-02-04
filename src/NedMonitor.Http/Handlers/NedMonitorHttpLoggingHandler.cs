@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using NedMonitor.Core;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
-using Zypher.Http.Extensions;
+using NedMonitor.Http.Extensions;
 
 namespace NedMonitor.Http.Handlers;
 
@@ -14,22 +14,16 @@ namespace NedMonitor.Http.Handlers;
 /// are enabled in <see cref="ExecutionModeSettings"/>.
 /// The collected data is stored in <see cref="HttpContext.Items"/> under a predefined key,
 /// allowing later access by other middleware or services.
-public class NedMonitorHttpLoggingHandler : DelegatingHandler
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="NedMonitorHttpLoggingHandler"/> class.
+/// </remarks>
+/// <param name="accessor">Provides access to the current <see cref="HttpContext"/>.</param>
+/// <param name="options">Options wrapper containing <see cref="NedMonitorSettings"/>.</param>
+public class NedMonitorHttpLoggingHandler(IHttpContextAccessor accessor, IOptions<NedMonitorSettings> options) : DelegatingHandler
 {
-    private readonly NedMonitorSettings _settings;
-    private readonly IHttpContextAccessor _accessor;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NedMonitorHttpLoggingHandler"/> class.
-    /// </summary>
-    /// <param name="accessor">Provides access to the current <see cref="HttpContext"/>.</param>
-    /// <param name="options">Options wrapper containing <see cref="NedMonitorSettings"/>.</param>
-
-    public NedMonitorHttpLoggingHandler(IHttpContextAccessor accessor, IOptions<NedMonitorSettings> options)
-    {
-        _settings = options.Value;
-        _accessor = accessor;
-    }
+    private readonly NedMonitorSettings _settings = options.Value;
+    private readonly IHttpContextAccessor _accessor = accessor;
 
     /// <summary>
     /// Sends the HTTP request and captures detailed information about the request and response,

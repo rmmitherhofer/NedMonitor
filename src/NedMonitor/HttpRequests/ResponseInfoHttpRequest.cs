@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents detailed information about an HTTP response.
 /// </summary>
-public class ResponseInfoHttpRequest
+internal class ResponseInfoHttpRequest
 {
     /// <summary>
     /// The HTTP status code returned by the response.

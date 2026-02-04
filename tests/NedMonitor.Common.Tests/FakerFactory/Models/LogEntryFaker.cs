@@ -4,7 +4,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Common.Tests.FakerFactory.Models;
 
-public static class LogEntryFaker
+internal static class LogEntryFaker
 {
     public static IEnumerable<LogEntry> CreateMany(
         int count,

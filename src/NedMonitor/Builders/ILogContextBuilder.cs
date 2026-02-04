@@ -9,7 +9,7 @@ namespace NedMonitor.Builders;
 /// exceptions, and snapshot metadata collected during an HTTP request.
 /// </summary>
 
-public interface ILogContextBuilder
+internal interface ILogContextBuilder
 {
     /// <summary>
     /// Initializes the builder with a <see cref="Snapshot"/> containing core request context data.

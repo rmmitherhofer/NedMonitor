@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace NedMonitor.Dapper.Extensions;
 
-public static class DynamicParametersExtensions
+internal static class DynamicParametersExtensions
 {
     public static IDictionary<string, object?> GetDeclaredParameters(object parametersInstance)
     {

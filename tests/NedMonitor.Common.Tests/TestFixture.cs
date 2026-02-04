@@ -7,8 +7,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.AutoMock;
 using NSubstitute;
-using Zypher.Notifications.Interfaces;
-
 namespace NedMonitor.Common.Tests;
 
 public abstract class TestFixture<T>
@@ -20,7 +18,6 @@ public abstract class TestFixture<T>
     public IConfiguration Configuration { get; protected set; }
     public IWebHostEnvironment Environment { get; protected set; }
     public Mock<ILogger<T>> Logger { get; protected set; }
-    public Mock<INotificationHandler> Notification { get; protected set; }
     protected TestFixture()
     {
         Services = new ServiceCollection();

@@ -6,7 +6,7 @@ namespace NedMonitor.Core.Models;
 /// Represents a single log entry containing metadata about the log event,
 /// including severity, category, origin, and timestamp.
 /// </summary>
-public class LogEntry
+internal class LogEntry
 {
     /// <summary>
     /// The category of the log, typically the source class or context.

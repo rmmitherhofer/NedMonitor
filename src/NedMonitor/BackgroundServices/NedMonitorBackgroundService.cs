@@ -10,7 +10,7 @@ namespace NedMonitor.BackgroundServices;
 /// Background service responsible for processing log snapshots from the NedMonitor queue
 /// and sending them asynchronously to the NedMonitor API.
 /// </summary>
-public class NedMonitorBackgroundService(IServiceScopeFactory scopeFactory, ILogger<NedMonitorBackgroundService> logger) : BackgroundService
+internal class NedMonitorBackgroundService(IServiceScopeFactory scopeFactory, ILogger<NedMonitorBackgroundService> logger) : BackgroundService
 {
     private readonly ILogger<NedMonitorBackgroundService> _logger = logger;
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;

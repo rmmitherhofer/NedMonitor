@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents information about an external dependency call or operation.
 /// </summary>
-public class DependencyInfo
+internal class DependencyInfo
 {
     /// <summary>
     /// The type or category of the dependency.

@@ -3,7 +3,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Common.Tests.FakerFactory.Models;
 
-public static class DbQueryEntryFaker
+internal static class DbQueryEntryFaker
 {
     public static IEnumerable<DbQueryEntry> CreateMany(
         int count,

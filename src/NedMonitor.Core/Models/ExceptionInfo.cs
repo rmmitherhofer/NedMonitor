@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a single exception captured by NedMonitor.
 /// </summary>
-public class ExceptionInfo
+internal class ExceptionInfo
 {
     /// <summary>
     /// The full type name of the exception (e.g., System.NullReferenceException).

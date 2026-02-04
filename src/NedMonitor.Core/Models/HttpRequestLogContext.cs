@@ -4,7 +4,7 @@
 /// Represents the logging context of an HTTP request and its response,
 /// including timing, headers, bodies, status, and exception details if any.
 /// </summary>
-public class HttpRequestLogContext
+internal class HttpRequestLogContext
 {
     /// <summary>
     /// The timestamp when the HTTP request started.

@@ -6,7 +6,7 @@ namespace NedMonitor.Middleware;
 /// Middleware that enables buffering on the HTTP request body,
 /// allowing it to be read multiple times during the request pipeline.
 /// </summary>
-public class BodyBufferingMiddleware(RequestDelegate next)
+internal class BodyBufferingMiddleware(RequestDelegate next)
 {
     /// <summary>
     /// The name identifier of the middleware.

@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents diagnostic information about the application environment and operations.
 /// </summary>
-public class DiagnosticHttpRequest
+internal class DiagnosticHttpRequest
 {
     /// <summary>
     /// The memory usage of the application in megabytes.

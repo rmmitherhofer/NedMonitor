@@ -7,9 +7,9 @@ using NedMonitor.Core.Enums;
 using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Models;
 using NedMonitor.Core.Settings;
+using NedMonitor.HttpResponses;
 using System.Reflection;
 using Xunit.Abstractions;
-using Zypher.Notifications.Messages;
 
 namespace NedMonitor.Tests.Builders;
 
@@ -223,7 +223,11 @@ public class LogContextBuilderTests(ITestOutputHelper output)
             return (Notification)ctor.Invoke(args);
         }
 
-        var notification = new Notification("key", "value");
+        var notification = new Notification()
+        {
+            Key = "key",
+            Value = "value",
+        };
         var field = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
             .FirstOrDefault(f => f.FieldType == typeof(LogLevel));
 

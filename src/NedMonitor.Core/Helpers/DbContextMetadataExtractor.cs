@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace NedMonitor.Core.Helpers;
 
-public static partial class DbContextMetadataExtractor
+internal static partial class DbContextMetadataExtractor
 {
     public static Dictionary<string, string?> Extract(IDbConnection connection)
     {

@@ -29,7 +29,7 @@ public sealed class NedMonitorMiddlewareTestsFixture
         return context;
     }
 
-    public Mock<INedMonitorQueue> CreateQueueMock()
+    internal Mock<INedMonitorQueue> CreateQueueMock()
     {
         var channel = Channel.CreateUnbounded<Snapshot>();
         var mock = new Mock<INedMonitorQueue>();

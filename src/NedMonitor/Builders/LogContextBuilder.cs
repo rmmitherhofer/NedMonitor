@@ -7,8 +7,6 @@ using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
 using System.Net;
 using System.Reflection;
-using Zypher.Json;
-using Zypher.Notifications.Messages;
 
 namespace NedMonitor.Builders;
 
@@ -17,7 +15,7 @@ namespace NedMonitor.Builders;
 /// information such as HTTP request and response details, environment data, user identity, notifications,
 /// log entries, exceptions, and diagnostics to be sent to NedMonitor.
 /// </summary>
-public class LogContextBuilder : ILogContextBuilder
+internal class LogContextBuilder : ILogContextBuilder
 {
     private readonly NedMonitorSettings _settings;
     private readonly SensitiveDataMasker _sensitiveDataMasker;

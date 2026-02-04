@@ -7,7 +7,7 @@ namespace NedMonitor.Queues;
 /// Implementation of <see cref="INedMonitorQueue"/> that manages an unbounded channel
 /// to queue <see cref="Snapshot"/> instances for asynchronous processing.
 /// </summary>
-public class NedMonitorQueue : INedMonitorQueue
+internal class NedMonitorQueue : INedMonitorQueue
 {
     private readonly Channel<Snapshot> _queue = Channel.CreateUnbounded<Snapshot>();
 

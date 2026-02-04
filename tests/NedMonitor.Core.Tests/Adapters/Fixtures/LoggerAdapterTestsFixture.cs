@@ -16,7 +16,7 @@ public sealed class LoggerAdapterTestsFixture
         Accessor.HttpContext = Context;
     }
 
-    public LoggerAdapter CreateLogger(LogLevel minimumLevel, FormatterOptions options)
+    internal LoggerAdapter CreateLogger(LogLevel minimumLevel, FormatterOptions options)
     {
         Context.Items.Clear();
         Accessor.HttpContext = Context;
@@ -24,7 +24,7 @@ public sealed class LoggerAdapterTestsFixture
         return new LoggerAdapter(options, "TestCategory", Accessor, settings);
     }
 
-    public LoggerAdapter CreateLoggerWithNullContext(LogLevel minimumLevel, FormatterOptions options)
+    internal LoggerAdapter CreateLoggerWithNullContext(LogLevel minimumLevel, FormatterOptions options)
     {
         Accessor.HttpContext = null;
         var settings = Options.Create(new NedMonitorSettings { MinimumLogLevel = minimumLevel });

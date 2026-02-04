@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a single query execution log entry.
 /// </summary>
-public class DbQueryEntry
+internal class DbQueryEntry
 {
     public string Provider { get; set; }
     /// <summary>

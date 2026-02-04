@@ -13,7 +13,7 @@ namespace NedMonitor.Core.Tests.Helpers.Fixtures
 
 namespace Fake.SqlClient
 {
-    internal sealed class FakeSqlConnection : DbConnection
+    public sealed class FakeSqlConnection : DbConnection
     {
         public override string ConnectionString { get; set; } = string.Empty;
         public override string Database => "Db";
@@ -30,7 +30,7 @@ namespace Fake.SqlClient
 
 namespace Npgsql
 {
-    internal sealed class FakeNpgsqlConnection : DbConnection
+    public sealed class FakeNpgsqlConnection : DbConnection
     {
         public override string ConnectionString { get; set; } = string.Empty;
         public override string Database => "Db";
@@ -47,7 +47,7 @@ namespace Npgsql
 
 namespace Oracle.ManagedDataAccess.Client
 {
-    internal sealed class FakeOracleConnection : DbConnection
+    public sealed class FakeOracleConnection : DbConnection
     {
         public override string ConnectionString { get; set; } = string.Empty;
         public override string Database => "Db";

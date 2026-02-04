@@ -7,7 +7,6 @@ using NedMonitor.Core.Settings;
 using NedMonitor.HttpRequests;
 using NedMonitor.HttpServices;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace NedMonitor.Tests.HttpServices.Fixtures;
@@ -24,14 +23,11 @@ public sealed class NedMonitorHttpServiceTestsFixture
             RemoteService = new RemoteServiceSettings
             {
                 BaseAddress = "https://example.local/",
-                Endpoints = new NedMonitorEndpointsSettings
-                {
-                    NotifyLogContext = "/logs"
-                }
+                Endpoint = "/logs"
             }
         };
 
-    public LogContextHttpRequest CreateLog(
+    internal LogContextHttpRequest CreateLog(
         string correlationId = "corr-id",
         string? clientId = "client-id",
         string? ipAddress = "127.0.0.1",
@@ -114,7 +110,7 @@ public sealed class NedMonitorHttpServiceTestsFixture
         };
     }
 
-    public (NedMonitorHttpService Service, TestHttpMessageHandler Handler) CreateService(
+    internal (NedMonitorHttpService Service, TestHttpMessageHandler Handler) CreateService(
         NedMonitorSettings settings,
         Func<HttpRequestMessage, HttpResponseMessage>? responseFactory = null)
     {
@@ -135,11 +131,9 @@ public sealed class NedMonitorHttpServiceTestsFixture
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         var logger = new Mock<ILogger<NedMonitorHttpService>>();
-        var notification = new Mock<Zypher.Notifications.Interfaces.INotificationHandler>();
 
         var service = new NedMonitorHttpService(
             client,
-            notification.Object,
             logger.Object,
             Options.Create(settings));
 

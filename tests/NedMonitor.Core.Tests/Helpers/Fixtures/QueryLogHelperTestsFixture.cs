@@ -7,7 +7,7 @@ public sealed class QueryLogHelperTestsFixture
 {
     public DefaultHttpContext Context { get; } = new();
 
-    public DbQueryEntry CreateEntry() => new()
+    internal DbQueryEntry CreateEntry() => new()
     {
         Provider = "Test",
         ORM = "TestOrm",

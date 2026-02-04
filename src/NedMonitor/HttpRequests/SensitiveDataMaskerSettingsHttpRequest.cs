@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents the configuration settings for sensitive data masking in HTTP requests.
 /// </summary>
-public class SensitiveDataMaskerSettingsHttpRequest
+internal class SensitiveDataMaskerSettingsHttpRequest
 {
     /// <summary>
     /// Indicates whether sensitive data masking is enabled.

@@ -3,7 +3,7 @@ using NedMonitor.Core.Models;
 
 namespace NedMonitor.Common.Tests.FakerFactory.Models;
 
-public static class DependencyInfoFaker
+internal static class DependencyInfoFaker
 {
     public static IEnumerable<DependencyInfo> CreateMany(
         int count,

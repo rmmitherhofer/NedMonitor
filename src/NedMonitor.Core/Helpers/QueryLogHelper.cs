@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NedMonitor.Core.Models;
-using System.Data;
-using System.Data.Common;
 
 namespace NedMonitor.Core.Helpers;
 
-public static class QueryLogHelper
+internal static class QueryLogHelper
 {
     public static void AddQueryLog(HttpContext context, DbQueryEntry entry)
     {

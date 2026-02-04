@@ -148,7 +148,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             sensitiveKeys: ["token", "secret"]);
 
         //When
-        services.AddOptions(configuration);
+        services.AddNedMonitor(configuration);
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
@@ -176,7 +176,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             sensitiveKeys: ["Token", "token"]);
 
         //When
-        services.AddOptions(configuration);
+        services.AddNedMonitor(configuration);
         var provider = services.BuildServiceProvider();
         var settings = provider.GetRequiredService<IOptions<NedMonitorSettings>>().Value;
 
@@ -201,7 +201,7 @@ public class NedMonitorConfigurationsTests(ITestOutputHelper output)
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:ExecutionMode:EnableMonitorLogs"] = enableMonitorLogs.ToString(),
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:ExecutionMode:EnableMonitorDbQueries"] = enableMonitorDbQueries.ToString(),
             [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:BaseAddress"] = "https://example.com/",
-            [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:Endpoints:NotifyLogContext"] = "/logs"
+            [$"{NedMonitorSettings.NEDMONITOR_NODE}:RemoteService:Endpoint"] = "/logs"
         };
 
         if (sensitiveKeys is not null)

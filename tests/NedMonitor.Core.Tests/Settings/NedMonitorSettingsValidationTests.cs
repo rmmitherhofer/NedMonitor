@@ -111,22 +111,22 @@ public class NedMonitorSettingsValidationTests(ITestOutputHelper output, NedMoni
     }
 
     [Fact(DisplayName =
-        "Given missing NotifyLogContext, " +
+        "Given missing Endpoint, " +
         "When validating, " +
-        "Then it fails with NotifyLogContext message")]
+        "Then it fails with Endpoint message")]
     [Trait("Settings", nameof(NedMonitorSettingsValidation))]
-    public async Task Validate_MissingNotifyLogContext_Fails()
+    public async Task Validate_MissingEndpoint_Fails()
     {
         //Given
         var settings = _fixture.CreateValidSettings();
-        settings.RemoteService.Endpoints.NotifyLogContext = null!;
+        settings.RemoteService.Endpoint = null!;
 
         //When
         var result = _fixture.Validate(settings);
 
         //Then
         result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain("NotifyLogContext");
+        result.FailureMessage.Should().Contain("Endpoint");
         await Task.CompletedTask;
     }
 

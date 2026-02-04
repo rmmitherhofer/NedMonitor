@@ -6,7 +6,7 @@ namespace NedMonitor.Queues;
 /// <summary>
 /// Represents a background queue for storing <see cref="Snapshot"/> instances to be processed asynchronously.
 /// </summary>
-public interface INedMonitorQueue
+internal interface INedMonitorQueue
 {
     /// <summary>
     /// Enqueues a <see cref="Snapshot"/> to be processed by the NedMonitor background service.

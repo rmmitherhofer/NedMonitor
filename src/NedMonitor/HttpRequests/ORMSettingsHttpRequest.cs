@@ -7,7 +7,7 @@ namespace NedMonitor.HttpRequests;
 /// Base configuration settings for ORM (Object-Relational Mapping) data logging.
 /// Used for both EF Core and Dapper interceptors.
 /// </summary>
-public abstract class ORMSettingsHttpRequest
+internal abstract class ORMSettingsHttpRequest
 {
     /// <summary>
     /// Indicates whether the interceptor is enabled.

@@ -45,10 +45,7 @@ public class NedMonitorSettingsDefaultsTests(ITestOutputHelper output)
         var settings = new RemoteServiceSettings
         {
             BaseAddress = "https://api.example.local",
-            Endpoints = new NedMonitorEndpointsSettings
-            {
-                NotifyLogContext = "/notify"
-            }
+            Endpoint = "/notify"
         };
 
         //When
@@ -56,8 +53,8 @@ public class NedMonitorSettingsDefaultsTests(ITestOutputHelper output)
 
         //Then
         baseAddress.Should().Be("https://api.example.local");
-        settings.Endpoints.Should().NotBeNull();
-        settings.Endpoints.NotifyLogContext.Should().Be("/notify");
+        settings.Endpoint.Should().NotBeNull();
+        settings.Endpoint.Should().Be("/notify");
         await Task.CompletedTask;
     }
 }

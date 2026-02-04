@@ -8,7 +8,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Contains basic information about a project.
 /// </summary>
-public class ProjectInfoHttp
+internal class ProjectInfoHttp
 {
     /// <summary>
     /// Unique identifier for the project.

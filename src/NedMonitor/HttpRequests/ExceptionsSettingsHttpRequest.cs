@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Configuration settings related to handling and logging exceptions.
 /// </summary>
-public class ExceptionsSettingsHttpRequest
+internal class ExceptionsSettingsHttpRequest
 {
     /// <summary>
     /// A list of fully qualified exception type names that should be treated as expected exceptions

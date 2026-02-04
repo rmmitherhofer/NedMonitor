@@ -159,9 +159,7 @@ Se preferir, use `PackageReference`:
     },
     "RemoteService": {
       "BaseAddress": "https://sua-api-nedmonitor",
-      "Endpoints": {
-        "NotifyLogContext": "/api/v1/logs"
-      }
+      "Endpoint": "meu-endpoint-path"
     }
   }
 }

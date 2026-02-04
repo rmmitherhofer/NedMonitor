@@ -2,7 +2,7 @@
 
 namespace NedMonitor.Common.Tests.Utils;
 
-public static class InternalToolsUtils
+public static class publicToolsUtils
 {
     public static string DecodeBase64String(string base64EncodedData)
     {

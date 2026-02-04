@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NedMonitor.Core.Enums;
+using NedMonitor.Core.Extensions;
 using NedMonitor.Core.Helpers;
 using NedMonitor.Core.Interfaces;
 using NedMonitor.Core.Models;
@@ -10,7 +11,6 @@ using NedMonitor.Dapper.Cache;
 using NedMonitor.Dapper.Extensions;
 using System.Data;
 using System.Diagnostics;
-using Zypher.Json;
 
 namespace NedMonitor.Dapper.Interceptors;
 

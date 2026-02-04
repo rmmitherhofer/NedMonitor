@@ -21,10 +21,7 @@ public sealed class LoggerProviderTestsFixture
             RemoteService = new RemoteServiceSettings
             {
                 BaseAddress = "https://example.local/",
-                Endpoints = new NedMonitorEndpointsSettings
-                {
-                    NotifyLogContext = "/logs"
-                }
+                Endpoint = "/logs"
             }
         });
 }

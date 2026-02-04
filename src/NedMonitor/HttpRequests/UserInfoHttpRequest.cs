@@ -5,7 +5,7 @@ namespace NedMonitor.HttpRequests;
 /// <summary>
 /// Represents the context information of the current user.
 /// </summary>
-public class UserInfoHttpRequest
+internal class UserInfoHttpRequest
 {
     /// <summary>
     /// The unique identifier of the user.

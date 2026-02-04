@@ -10,7 +10,7 @@ namespace NedMonitor.Providers;
 /// Logger provider for NedMonitor logger.
 /// </summary>
 [ProviderAlias("NedMonitor")]
-public class LoggerProvider : ILoggerProvider
+internal class LoggerProvider : ILoggerProvider
 {
     private readonly FormatterOptions _options;
     private readonly IHttpContextAccessor _httpContextAccessor;

@@ -5,7 +5,7 @@ namespace NedMonitor.HttpServices;
 /// <summary>
 /// Interface for sending logs to the NedMonitor service.
 /// </summary>
-public interface INedMonitorHttpService
+internal interface INedMonitorHttpService
 {
     /// <summary>
     /// Sends a complete log context to the NedMonitor API.

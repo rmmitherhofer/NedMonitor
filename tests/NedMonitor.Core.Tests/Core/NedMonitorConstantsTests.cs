@@ -1,6 +1,5 @@
 using FluentAssertions;
 using NedMonitor.Common.Tests;
-using NedMonitor.Core;
 using Xunit.Abstractions;
 
 namespace NedMonitor.Core.Tests.Core;

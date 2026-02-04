@@ -6,7 +6,7 @@ namespace NedMonitor.HttpRequests;
 /// Represents feature flags for enabling or disabling individual NedMonitor features.
 /// Allows granular control over what should be logged or monitored.
 /// </summary>
-public class ExecutionModeSettingsHttpRequest
+internal class ExecutionModeSettingsHttpRequest
 {
     /// <summary>
     /// Enables or disables the NedMonitor entirely.
